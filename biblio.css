@@ -1,0 +1,55 @@
+body { font-family: sans-serif; }
+h1 { font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; font-size: 2.2em }
+h1, h2 { text-align: center; }
+a { text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { cursor: pointer; left: auto }
+
+#ListaBiblio {
+				display: flex;
+				flex-wrap: wrap;
+				flex-direction: row;
+				place-content: space-evenly;
+			}
+
+.ContenitoreBiblio { width: 250px; }
+
+.PulsantiBiblio { text-align: center }
+
+.WrapperIframe {
+				width: 250px;
+				height: 280px;
+				overflow-y: hidden;
+				overflow-x: hidden;
+				background-image: url("res/ThrobberRolling.svg");
+				background-repeat: no-repeat;
+				background-position: center;
+			}
+
+iframe { border: none; height: 2000px; width: 100%; overflow-y: visible; }
+
+#footer { opacity: 0.6; text-align: center; }
+
+/* Applico di default il tema giorno, per i browser che non supportano "prefers-color-scheme" */
+body { background-color: white; color: black; }
+h1, h2 { color: cornflowerblue; }
+a { color: navy; }
+button { background-color: gainsboro; color: black; }
+
+/* TEMA GIORNO */
+@media (prefers-color-scheme: light)
+{
+	body { background-color: white; color: black; }
+	h1, h2 { color: cornflowerblue; }
+	a { color: navy; }
+	button { background-color: gainsboro; color: black; }
+}
+
+/* TEMA NOTTE */
+@media (prefers-color-scheme: dark)
+{
+	body { background-color: #111111; color: white; }
+	h1, h2 { color: dodgerblue; }
+	a { color: goldenrod; }
+	button { background-color: #333333; color: white; }
+}
