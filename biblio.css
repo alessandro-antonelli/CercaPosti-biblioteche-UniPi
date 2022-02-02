@@ -4,8 +4,32 @@ body { font-family: sans-serif; }
 h1 { font-family: "Francois One", Helvetica, sans-serif; font-size: 2.2em }
 h1, h2 { text-align: center; }
 a { text-decoration: none; }
+p { margin-block-start: 0; margin-block-end: 0; margin-top: 0.5em; margin-bottom: 0.5em; }
 a:hover { text-decoration: underline; }
-button { cursor: pointer; left: auto }
+label, input, select, button { cursor: pointer; font-size: 100%; }
+input[type=checkbox] { zoom: 2; float: left; height: 100%; margin-right: 0.2em !important; }
+input[type=checkbox]:disabled { cursor: not-allowed; }
+
+#toolbar {
+			display: flex;
+			flex-wrap: wrap;
+			flex-direction: row;
+			place-content: center;
+			vertical-align: top;
+			margin: 0.5em 0;
+			text-align: center;
+		}
+
+#toolbar * { margin: 0 0.5em }
+
+#stat-generali {
+					width: fit-content;
+					max-width: 66%;
+					margin: 0.5em auto 0.5em auto;
+					padding: 0.5em;
+					text-align: center;
+					border:1px solid silver;
+				}
 
 #ListaBiblio {
 				display: flex;
@@ -17,6 +41,7 @@ button { cursor: pointer; left: auto }
 .ContenitoreBiblio { width: 250px; }
 
 .PulsantiBiblio { text-align: center }
+.PulsantiBiblio * { margin-right: 0.5em; white-space: nowrap; }
 
 .WrapperIframe {
 				width: 250px;
@@ -30,12 +55,13 @@ button { cursor: pointer; left: auto }
 
 iframe { border: none; height: 2000px; width: 100%; overflow-y: visible; }
 
-#footer { opacity: 0.6; text-align: center; }
+#DataAggiornamento { font-weight: bold; }
+#footer { opacity: 0.6; text-align: center; background-color: rgba(128, 128, 128, 0.3) }
 
 #loading-box {
 				display: none;
 				width: fit-content;
-				margin: auto;
+				margin: 0.5em auto 0.5em auto;
 				border-radius: 14px;
 				font-weight: bold;
 				background-color: gold;

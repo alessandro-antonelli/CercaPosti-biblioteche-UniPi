@@ -1,6 +1,11 @@
 const versione = "1.1"
-var PosizioneUtente
 const UrlBaseGraficiPosti = "https://qrbiblio.unipi.it/Home/Chart?IdCat="
+var PosizioneUtente
+var TimestampUltimoAggiornamento = 0;
+var OrdineBiblioteche = []
+
+var TimerAggiornaScritteTempo
+var TimerAggiornaPagina
 
 const Biblioteche = [
 						{	sigla: "AGR",
@@ -23,8 +28,8 @@ const Biblioteche = [
 							OrarioApertura: null,
 							GiorniChiusura: [0,1,2,3,4,5,6],
 							indirizzo: "Via Cosimo Ridolfi 10",
-							latitudine: "43.70694",
-							longitudine: "10.41297",
+							latitudine: "43.71119680445201",
+							longitudine: "10.410463494623068",
 							url: "http://www.sba.unipi.it/it/biblioteche/polo-1/economia"
 						},
 						{	sigla: "VET",
@@ -59,8 +64,8 @@ const Biblioteche = [
 							OrarioApertura: [9, 0, 20, 0],
 							GiorniChiusura: [6, 0],
 							indirizzo: "Via Moruzzi 13",
-							latitudine: "43.7188423",
-							longitudine: "10.4230224",
+							latitudine: "43.71742660188611",
+							longitudine: "10.42718640847391",
 							url: "http://www.sba.unipi.it/it/biblioteche/polo-3/chimica"
 						},
 						{	sigla: "MIF",
@@ -173,17 +178,13 @@ const Biblioteche = [
 						}
 					]
 
-function SegnaProgressoCaricamento(completati)
+/***************** MAIN ***************/
 {
-	//alert("SegnaProgressoCaricamento: " + completati + "/" + Biblioteche.length)
-	if(completati >= Biblioteche.length) document.getElementById("loading-box").style.display = "none"
-	document.getElementById("loading-done").innerText = completati
-	document.querySelector("#loading-box > div > div").style.width = (completati / Biblioteche.length * 100) + "%"
-}
-
-{
+	document.getElementById("avviso-nojs").style.display = "none"
 	document.getElementById("AppVersion").innerText = versione
-	//document.getElementById("ButtAggiorna").addEventListener("click", AggiornaFrames)
+	for(var i=0; i<Biblioteche.length; i++) OrdineBiblioteche.push(i)
+
+	RegistraHandler()
 
 	var CapienzaTotale = 0
 	Biblioteche.forEach(biblioteca => { CapienzaTotale += biblioteca.capienza } )
@@ -192,18 +193,33 @@ function SegnaProgressoCaricamento(completati)
 	if (navigator.geolocation) navigator.geolocation.watchPosition(MemorizzaPosizioneUtente, MemorizzaRifiutoPosizioneUtente);
 	else MemorizzaRifiutoPosizioneUtente()
 
+	InserisciBoxBiblioteche()
+	OrdinaBoxBiblioteche()
+	CaricaFrames()
+}
 
+function RegistraHandler()
+{
+	TimerAggiornaScritteTempo = setInterval(AggiornaPassaggioTempo, 10000)
+	document.addEventListener("visibilitychange", function() {
+		if(document.hidden) clearInterval(TimerAggiornaScritteTempo)
+		else { AggiornaPassaggioTempo(); TimerAggiornaScritteTempo = setInterval(AggiornaPassaggioTempo, 10000); }
+	} );
+	document.getElementById("ButtAggiorna").addEventListener("click", CaricaFrames)
+	document.getElementById("auto-refresh").addEventListener("click", function() {
+		if(document.getElementById("auto-refresh").checked) { ControllaSeMomentoAutoRefresh(); TimerAggiornaPagina = setInterval(ControllaSeMomentoAutoRefresh, 30000); }
+		else clearInterval(TimerAggiornaPagina)
+	})
+	document.getElementById("ordina-distanza").addEventListener("click", OrdinaBoxBiblioteche)
+}
 
-
-
-	document.getElementById("loading-total").innerText = Biblioteche.length
-	document.getElementById("loading-box").style.display = "block"
-	SegnaProgressoCaricamento(0)
-
+function InserisciBoxBiblioteche()
+{
 	Biblioteche.forEach(biblioteca => {
 		var contenitore = document.createElement('div')
 		contenitore.style.display = "inline-block"
 		contenitore.classList = "ContenitoreBiblio"
+		contenitore.id = "ContenitoreBiblio" + biblioteca.sigla
 
 		var titolo = document.createElement("h2")
 		titolo.innerText = biblioteca.NomeBreve
@@ -213,20 +229,50 @@ function SegnaProgressoCaricamento(completati)
 		var pulsanti = document.createElement("div")
 		pulsanti.className = "PulsantiBiblio"
 
-		if(biblioteca.GiorniChiusura != null) pulsanti.innerHTML += ` <span title="Orario di apertura">🕖${FormattaOrario(biblioteca.OrarioApertura, biblioteca.GiorniChiusura)}</span>`
+		if(biblioteca.GiorniChiusura != null)
+		{
+			var ElemOrario = document.createElement("span")
+			ElemOrario.id = "Apertura" + biblioteca.sigla
+			ElemOrario.title = "Orario di apertura"
+			AggiornaOrarioApertura(biblioteca, ElemOrario)
+			//ElemOrario.innerText = "🕖" + FormattaOrario(biblioteca.OrarioApertura, biblioteca.GiorniChiusura)
+			pulsanti.appendChild(ElemOrario)
+		}
 
-		if(biblioteca.capienza != null) pulsanti.innerHTML += ` <span title="Capienza massima">🪑${biblioteca.capienza}</span>`
+		if(biblioteca.capienza != null)
+		{
+			var ElemCapienza = document.createElement("span")
+			ElemCapienza.innerText = "🪑" + biblioteca.capienza
+			ElemCapienza.title = "Capienza massima"
+			pulsanti.appendChild(ElemCapienza)
+		}
 
-		if(biblioteca.url != "") pulsanti.innerHTML += ` <a title="Sito web" target="_blank" href="${biblioteca.url}">🌐web</a>`
+		if(biblioteca.url != "")
+		{
+			var ElemSito = document.createElement("a")
+			ElemSito.innerText = "🌐web"
+			ElemSito.title = "Sito web"
+			ElemSito.href = biblioteca.url
+			ElemSito.target = "_blank"
+			pulsanti.appendChild(ElemSito)
+		}
 
 		var AbbiamoCoordinate = (biblioteca.latitudine != "" && biblioteca.longitudine != "")
 		if(biblioteca.indirizzo != "" || AbbiamoCoordinate)
 		{
-			if(AbbiamoCoordinate)
-			{
-				const URLmappa = 'https://www.google.com/maps/search/?api=1&query=' + biblioteca.latitudine + ',' + biblioteca.longitudine;
-				pulsanti.innerHTML += ` <div><a id="Posiz${biblioteca.sigla}" title="Posizione" target="_blank" href="${URLmappa}">🗺️ ${biblioteca.indirizzo}</a></div>`
-			} else pulsanti.innerHTML += ` <div id="Posiz${biblioteca.sigla}" title="Posizione">🗺️ ${biblioteca.indirizzo}</div>`
+			var ElemPosizione = document.createElement("span")
+			ElemPosizione.innerText = "🗺️"
+
+			var ElemLink = document.createElement("a")
+			ElemLink.id = "Distanza" + biblioteca.sigla
+			ElemLink.innerText = "posiz."
+			ElemLink.target = "_blank"
+
+			if(AbbiamoCoordinate) ElemLink.href = 'https://www.google.com/maps/search/?api=1&query=' + biblioteca.latitudine + ',' + biblioteca.longitudine
+			else if(biblioteca.indirizzo != "") ElemLink.href = 'https://www.google.com/maps/search/?api=1&query=' + biblioteca.indirizzo + ', Pisa'
+
+			ElemPosizione.appendChild(ElemLink)
+			pulsanti.appendChild(ElemPosizione)
 		}
 		contenitore.appendChild(pulsanti)
 
@@ -237,9 +283,6 @@ function SegnaProgressoCaricamento(completati)
 
 			var iframe = document.createElement('iframe');
 			iframe.id = "iframe" + biblioteca.sigla
-			iframe.src = UrlBaseGraficiPosti + biblioteca.IDGraficoPosti
-			iframe.addEventListener("load", ScrollaIframe.bind(null, "iframe" + biblioteca.sigla))
-			iframe.style.opacity = 0
 			Wrapper.appendChild(iframe)
 		} else
 		{
@@ -247,7 +290,6 @@ function SegnaProgressoCaricamento(completati)
 			Wrapper.style.textAlign = "center"
 			Wrapper.style.paddingTop = "100px"
 			Wrapper.innerHTML = "Nessun<br/>dato"
-			SegnaProgressoCaricamento(parseInt(document.getElementById("loading-done").innerText) + 1)
 		}
 		contenitore.appendChild(Wrapper)
 
@@ -255,9 +297,56 @@ function SegnaProgressoCaricamento(completati)
 	});
 }
 
+function OrdinaBoxBiblioteche()
+{
+	if(PosizioneUtente != null && document.getElementById("ordina-distanza").checked)
+	{
+		OrdineBiblioteche.sort(function(a, b)
+		{
+			var DistBiblioA = getDistanceFromLatLonInKm(Biblioteche[a].latitudine, Biblioteche[a].longitudine, PosizioneUtente.coords.latitude, PosizioneUtente.coords.longitude)
+			var DistBiblioB = getDistanceFromLatLonInKm(Biblioteche[b].latitudine, Biblioteche[b].longitudine, PosizioneUtente.coords.latitude, PosizioneUtente.coords.longitude)
+			return DistBiblioA - DistBiblioB
+		})
+
+		var ElemListaBiblio = document.getElementById("ListaBiblio")
+		for(var i=0; i < OrdineBiblioteche.length; i++)
+		{
+			var biblio = Biblioteche[OrdineBiblioteche[i]]
+			var ElemBiblio = document.getElementById("ContenitoreBiblio" + biblio.sigla)
+			ElemListaBiblio.append(ElemBiblio)
+		}
+	}
+}
+
+function AggiornaOrarioApertura(biblioteca, ElemOrario)
+{
+	var StatoApertura = StatoAttualeApertura(biblioteca)
+	if(StatoApertura[0] == true)
+	{
+		ElemOrario.innerText = "🕖Aperta (per " + DaMinutiAOreMinuti(StatoApertura[1]) + ")"
+		if(StatoApertura[1] > 75) ElemOrario.style.color = "green";
+		else if(StatoApertura[1] > 45) ElemOrario.style.color = "yellow";
+		else ElemOrario.style.color = "red";
+	}
+	else
+	{
+		if(StatoApertura[1] == -2) { ElemOrario.innerText = "🕖Chiusa permanentemente"; ElemOrario.style.color = "skyblue"; }
+		else if(StatoApertura[1] == -1) { ElemOrario.innerText = "🕖Chiusa oggi"; ElemOrario.style.color = "skyblue"; }
+		else if(StatoApertura[1] == 0) { ElemOrario.innerText = "🕖Chiusa (turno concluso)";
+										ElemOrario.style.color = "skyblue"; } //Turno odierno concluso
+		else ElemOrario.innerText = "🕖Chiusa (aprirà tra " + DaMinutiAOreMinuti(StatoApertura[1]) + ")"
+	}
+}
+
+function DaMinutiAOreMinuti(minuti)
+{
+	if(minuti < 60) return minuti + " min"
+	else return Math.floor(minuti / 60) + "h " + (minuti % 60) + "m"
+}
+
 function FormattaOrario(StringheOrario, GiorniChiusura)
 {
-	//if(GiorniChiusura.count = 7) return "Chiusa permanentemente"
+	//if(GiorniChiusura.count == 7) return "Chiusa permanentemente"
 	if(GiorniChiusura.includes( (new Date()).getDay() ) ) return "Chiusa" //solo oggi
 
 	var RetVal = StringheOrario[0]
@@ -275,6 +364,39 @@ function FormattaOrario(StringheOrario, GiorniChiusura)
 	return RetVal
 }
 
+function CaricaFrames()
+{
+	document.getElementById("loading-total").innerText = Biblioteche.length
+	document.getElementById("loading-box").style.display = "block"
+	SegnaProgressoCaricamento(0)
+
+	Biblioteche.forEach(biblioteca => {
+		if(biblioteca.IDGraficoPosti != "")
+		{
+			var frame = document.getElementById("iframe" + biblioteca.sigla)
+			frame.src = 'about:blank'
+			frame.style.opacity = 0
+			frame.addEventListener("load", ScrollaIframe.bind(null, "iframe" + biblioteca.sigla))
+			frame.src = UrlBaseGraficiPosti + biblioteca.IDGraficoPosti
+		} else
+		{
+			SegnaProgressoCaricamento(parseInt(document.getElementById("loading-done").innerText) + 1)
+		}
+	})
+}
+
+function SegnaProgressoCaricamento(completati)
+{
+	if(completati >= Biblioteche.length)
+	{
+		document.getElementById("loading-box").style.display = "none"
+		TimestampUltimoAggiornamento = (new Date()).getTime()
+		AggiornaPassaggioTempo()
+	}
+	document.getElementById("loading-done").innerText = completati
+	document.querySelector("#loading-box > div > div").style.width = (completati / Biblioteche.length * 100) + "%"
+}
+
 function ScrollaIframe(ID)
 {
 	var frame = document.getElementById(ID)
@@ -283,34 +405,128 @@ function ScrollaIframe(ID)
 	SegnaProgressoCaricamento(parseInt(document.getElementById("loading-done").innerText) + 1)
 }
 
-/* function AggiornaFrames()
+function StatoAttualeApertura(biblio)
 {
-	Biblioteche.forEach(biblioteca => {
-		var frame = document.getElementById("iframe" + biblioteca.sigla)
-		frame.style.opacity = 0
-		frame.src += ''
-	})
-} */
+	var OraAttuale = new Date()
+	if(biblio.GiorniChiusura.length == 7) return [false, -2] //Chiusa permanentemente
+	if(biblio.GiorniChiusura.includes(OraAttuale.getDay()) ) return [false, -1] //chiusa solo oggi
+
+	var HaGiaAperto = (OraAttuale.getHours() > biblio.OrarioApertura[0]) || (OraAttuale.getHours() == biblio.OrarioApertura[0] && OraAttuale.getMinutes() >= biblio.OrarioApertura[1])
+	var HaGiaChiuso = (OraAttuale.getHours() > biblio.OrarioApertura[2]) || (OraAttuale.getHours() == biblio.OrarioApertura[2] && OraAttuale.getMinutes() >= biblio.OrarioApertura[3])
+
+	if(!HaGiaAperto)
+	{
+		var MinutiPrimaDiApertura = (biblio.OrarioApertura[0] - OraAttuale.getHours()) * 60 + ((biblio.OrarioApertura[1] - OraAttuale.getMinutes()) % 60)
+		return [false, MinutiPrimaDiApertura]; //aprirà tra tot minuti
+	}
+	else if(HaGiaAperto && !HaGiaChiuso)
+	{
+		var MinutiPrimaDiChiusura = (biblio.OrarioApertura[2] - OraAttuale.getHours()) * 60 + ((biblio.OrarioApertura[3] - OraAttuale.getMinutes()) % 60)
+		return [true, MinutiPrimaDiChiusura]; //è aperta
+	}
+	else if(HaGiaAperto && HaGiaChiuso) return [false, 0]; //apertura odierna conclusa
+}
+
+function AggiornaPassaggioTempo()
+{
+	if(TimestampUltimoAggiornamento != 0)
+	{
+		var ElemAggiornamento = document.getElementById("DataAggiornamento")
+		ElemAggiornamento.innerHTML = TempoPassatoDaTimestamp(TimestampUltimoAggiornamento) + " fa"
+
+		var MinutiTrascorsi = Math.floor( (((new Date()).getTime()) - TimestampUltimoAggiornamento) / 60000)
+		if(MinutiTrascorsi < 1) ElemAggiornamento.style.color = "lime"
+		else if(MinutiTrascorsi < 3) ElemAggiornamento.style.color = "green"
+		else if(MinutiTrascorsi < 5) ElemAggiornamento.style.color = "unset"
+		else if(MinutiTrascorsi < 10) ElemAggiornamento.style.color = "blu"
+		else if(MinutiTrascorsi < 15) ElemAggiornamento.style.color = "orange"
+		else if(MinutiTrascorsi < 30) ElemAggiornamento.style.color = "darkorange"
+		else ElemAggiornamento.style.color = "red"
+
+		ElemAggiornamento.title = "Dati aggiornati alle ore " + OreMinutiDaTimestamp(TimestampUltimoAggiornamento)  + " del " + GiornoMeseAnnoDaTimestamp(TimestampUltimoAggiornamento)
+
+		Biblioteche.forEach(biblio => {
+			AggiornaOrarioApertura(biblio, document.getElementById("Apertura" + biblio.sigla))
+		});
+	}
+}
+
+function ControllaSeMomentoAutoRefresh()
+{
+	if(TimestampUltimoAggiornamento == 0) CaricaFrames()
+	else if( ( ((new Date()).getTime()) - TimestampUltimoAggiornamento) >= 300000) CaricaFrames()
+}
+
+function TempoPassatoDaTimestamp(timestamp)
+{
+	var MillisecTrascorsi = ((new Date()).getTime()) - timestamp
+
+	if(MillisecTrascorsi < 60000) return "meno di un minuto"
+	else if(MillisecTrascorsi < 3600000)
+	{
+		var NumMinuti = Math.floor(MillisecTrascorsi / 60000)
+		if(NumMinuti == 1) return "un minuto"
+		else return NumMinuti + " minuti"
+	}
+	else if(MillisecTrascorsi < 86400000)
+	{
+		var NumOre = Math.floor(MillisecTrascorsi / 3600000)
+		if(NumOre == 1) return "un'ora"
+		else return NumOre + " ore"
+	}
+	else
+	{
+		var NumGiorni = Math.floor(MillisecTrascorsi / 86400000)
+		if(NumGiorni == 1) return "un giorno"
+		else return NumGiorni + " giorni"
+	}
+}
+
+function OreMinutiDaTimestamp(timestamp)
+{
+	var Data = new Date(timestamp)
+
+	var RetVal = Data.getHours() + ":"
+
+	if(Data.getMinutes() < 10) RetVal += "0" + Data.getMinutes()
+	else RetVal += Data.getMinutes()
+
+	return RetVal
+}
+
+function GiornoMeseAnnoDaTimestamp(timestamp)
+{
+	var Data = new Date(timestamp)
+	return Data.getDate() + "/" + (Data.getMonth() + 1) + "/" + Data.getFullYear()
+}
 
 /********** GEOLOCALIZZAZIONE **********/
 
 function MemorizzaPosizioneUtente(posizione)
 {
-	if(posizione.coords.accuracy <= 2000)
+	if(posizione.coords.accuracy < 800)
 	{
 		PosizioneUtente = posizione;
+		document.getElementById("ordina-distanza").disabled = false;
 		Biblioteche.forEach(biblioteca => {
-			var elemento = document.getElementById("Posiz" + biblioteca.sigla);
-			elemento.innerText = DistanzaFormattata([biblioteca.longitudine, biblioteca.latitudine]);
-			elemento.title = 'Sei distante ' + distanza + ' dalla biblioteca ' + biblioteca.NomeBreve + '.\nClicca per vedere la mappa';
+			var AbbiamoCoordinate = (biblioteca.latitudine != "" && biblioteca.longitudine != "")
+			if(AbbiamoCoordinate)
+			{
+				var distanza = DistanzaFormattata([biblioteca.latitudine, biblioteca.longitudine]);
+				var elemento = document.getElementById("Distanza" + biblioteca.sigla);
+				elemento.innerText = distanza
+				elemento.parentElement.title = 'Sei distante ' + distanza + ' dalla biblioteca ' + biblioteca.NomeBreve + '.\nClicca per vedere la mappa';
+			}
 		});
+		OrdinaBoxBiblioteche();
 	} else
 	{
 		PosizioneUtente = null;
+		document.getElementById("ordina-distanza").disabled = true;
 		Biblioteche.forEach(biblioteca => {
 			var elemento = document.getElementById("Posiz" + biblioteca.sigla);
 			elemento.innerText = "posiz.";
-			elemento.title = "Vedi la posizione della biblioteca " + biblioteca.NomeBreve + " sulla mappa";
+			elemento.parentElement.title = "Vedi la posizione della biblioteca " + biblioteca.NomeBreve + " sulla mappa";
 		});
 	}
 }
@@ -318,6 +534,7 @@ function MemorizzaPosizioneUtente(posizione)
 function MemorizzaRifiutoPosizioneUtente(errore)
 {
 	PosizioneUtente = null;
+	document.getElementById("ordina-distanza").disabled = true;
 
 	Biblioteche.forEach(biblioteca => {
 		var elemento = document.getElementById("Posiz" + biblioteca.sigla);
@@ -326,7 +543,7 @@ function MemorizzaRifiutoPosizioneUtente(errore)
 	});
 }
 
-exports.DistanzaFormattata = function(posizione)
+function DistanzaFormattata(posizione)
 {
 	const km = getDistanceFromLatLonInKm(posizione[0], posizione[1], PosizioneUtente.coords.latitude, PosizioneUtente.coords.longitude)
 	return FormattaDistanza(km);
@@ -340,8 +557,8 @@ function FormattaDistanza(distanzaKm)
 	else return Math.round(distanzaKm) + 'km';
 }
 
-exports.getDistanceFromLatLonInKm = getDistanceFromLatLonInKm;
-function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2)
+{
 	var R = 6371; // Radius of the earth in km
 	var dLat = deg2rad(lat2-lat1); // deg2rad below
 	var dLon = deg2rad(lon2-lon1);
@@ -355,6 +572,7 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
 	return d;
 }
 
-function deg2rad(deg) {
+function deg2rad(deg)
+{
 	return deg * (Math.PI/180)
 }
