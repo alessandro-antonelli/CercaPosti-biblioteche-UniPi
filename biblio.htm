@@ -9,7 +9,34 @@
 <body>
 	<h1>CercaPosti biblioteche UniPi</h1>
 
+	<div id="loading-box">
+		Caricamento dati in corso... <span id="loading-done"></span>/<span id="loading-total"></span>
+		<div class="progressbar-esterno">
+			<div class="progressbar-interno">&nbsp;</div>
+		</div>
+	</div>
+
 	<!--<button id="ButtAggiorna" name="Aggiorna i dati delle biblioteche">🔄<br/>Aggiorna</button>-->
+
+	<div>
+		<label for="ordine">Ordina lista per:</label>
+		<select id="ordine" name="ordine">
+			<option value="posti-liberi">Posti liberi</option>
+			<option value="distanza">Distanza</option>
+  			<option value="apertura-residua">Durata apertura residua</option>
+		</select>
+	</div>
+	<div>
+		<h3>Filtri</h3>
+		<input type="checkbox">Escludi biblioteche attualmente chiuse</input>
+		<input type="checkbox">Escludi biblioteche attualmente piene</input>
+	</div>
+
+	<div style="border:1px solid silver">
+		<p>Capienza totale: <span id="capienza-totale">?</span> posti</p>
+		<p>Posto più vicino: 6km</p>
+	</div>
+
 	<div id="ListaBiblio"></div>
 
 	<div id="footer">
@@ -26,7 +53,7 @@
 			<a href="https://www.sba.unipi.it/" target="_blank">Sistema Bibliotecario di Ateneo</a> e già pubblicamente accessibili sul suo sito.
 		</p>
 
-		<p>Throbber: <a href="https://loading.io/asset/475308" target="_blank">loading.io</a>, free license</p>
+		<p>Throbber: <a href="https://loading.io/asset/475308" target="_blank">loading.io</a>, free license | Font titolo: <a href="https://fonts.google.com/specimen/Francois+One" target="_blank">Vernon Adams</a>, Open Font License</p>
 	</div>
 
 	<script src="biblio.js"></script>

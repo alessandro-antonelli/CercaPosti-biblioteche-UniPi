@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Francois+One&display=swap');
+
 body { font-family: sans-serif; }
-h1 { font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; font-size: 2.2em }
+h1 { font-family: "Francois One", Helvetica, sans-serif; font-size: 2.2em }
 h1, h2 { text-align: center; }
 a { text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -30,11 +32,27 @@ iframe { border: none; height: 2000px; width: 100%; overflow-y: visible; }
 
 #footer { opacity: 0.6; text-align: center; }
 
+#loading-box {
+				display: none;
+				width: fit-content;
+				margin: auto;
+				border-radius: 14px;
+				font-weight: bold;
+				background-color: gold;
+				text-align: center;
+				color: black;
+				padding: 5px;
+			}
+
+.progressbar-esterno { height: 1.5em; width: 15em; border: 2px solid gray; padding: 0; margin: auto; }
+.progressbar-interno { height: 100%; background-color: limegreen; margin: 0; }
+
 /* Applico di default il tema giorno, per i browser che non supportano "prefers-color-scheme" */
 body { background-color: white; color: black; }
 h1, h2 { color: cornflowerblue; }
 a { color: navy; }
 button { background-color: gainsboro; color: black; }
+.progressbar-esterno { background-color: white; }
 
 /* TEMA GIORNO */
 @media (prefers-color-scheme: light)
@@ -43,6 +61,7 @@ button { background-color: gainsboro; color: black; }
 	h1, h2 { color: cornflowerblue; }
 	a { color: navy; }
 	button { background-color: gainsboro; color: black; }
+	.progressbar-esterno { background-color: white; }
 }
 
 /* TEMA NOTTE */
@@ -52,4 +71,5 @@ button { background-color: gainsboro; color: black; }
 	h1, h2 { color: dodgerblue; }
 	a { color: goldenrod; }
 	button { background-color: #333333; color: white; }
+	.progressbar-esterno { background-color: #111111; }
 }
