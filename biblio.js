@@ -1,8 +1,9 @@
-const versione = "1.1"
+const versione = "1.2"
 const UrlBaseGraficiPosti = "https://qrbiblio.unipi.it/Home/Chart?IdCat="
 var PosizioneUtente
 var TimestampUltimoAggiornamento = 0;
 var OrdineBiblioteche = []
+var DistanzaBiblioteche = []
 
 var TimerAggiornaScritteTempo
 var TimerAggiornaPagina
@@ -184,8 +185,10 @@ const Biblioteche = [
 	document.getElementById("AppVersion").innerText = versione
 	for(var i=0; i<Biblioteche.length; i++) OrdineBiblioteche.push(i)
 
+	CaricaImpostazioni()
 	RegistraHandler()
 
+	document.getElementById("num-biblio-totali").innerText = Biblioteche.length
 	var CapienzaTotale = 0
 	Biblioteche.forEach(biblioteca => { CapienzaTotale += biblioteca.capienza } )
 	document.getElementById("capienza-totale").innerText = CapienzaTotale
@@ -194,8 +197,15 @@ const Biblioteche = [
 	else MemorizzaRifiutoPosizioneUtente()
 
 	InserisciBoxBiblioteche()
+	AggiornaTuttiOrariApertura()
 	OrdinaBoxBiblioteche()
 	CaricaFrames()
+}
+
+function CaricaImpostazioni()
+{
+	if(localStorage.getItem("auto-refresh") != null) ImpostaAutoRefresh(localStorage.getItem("auto-refresh"))
+	if(localStorage.getItem("ordina-distanza") != null) ImpostaOrdinamentoLista(localStorage.getItem("ordina-distanza"))
 }
 
 function RegistraHandler()
@@ -206,11 +216,32 @@ function RegistraHandler()
 		else { AggiornaPassaggioTempo(); TimerAggiornaScritteTempo = setInterval(AggiornaPassaggioTempo, 10000); }
 	} );
 	document.getElementById("ButtAggiorna").addEventListener("click", CaricaFrames)
-	document.getElementById("auto-refresh").addEventListener("click", function() {
-		if(document.getElementById("auto-refresh").checked) { ControllaSeMomentoAutoRefresh(); TimerAggiornaPagina = setInterval(ControllaSeMomentoAutoRefresh, 30000); }
-		else clearInterval(TimerAggiornaPagina)
-	})
-	document.getElementById("ordina-distanza").addEventListener("click", OrdinaBoxBiblioteche)
+	document.getElementById("auto-refresh").addEventListener("click", ImpostaAutoRefresh.bind(null, null))
+	document.getElementById("ordina-distanza").addEventListener("click", ImpostaOrdinamentoLista.bind(null, null))
+}
+
+function ImpostaOrdinamentoLista(NuovoValore)
+{
+	if(NuovoValore == null) NuovoValore = document.getElementById("ordina-distanza").checked
+
+	document.getElementById("ordina-distanza").checked = NuovoValore
+	localStorage.setItem("ordina-distanza", NuovoValore)
+
+	if(NuovoValore = true) OrdinaBoxBiblioteche()
+}
+
+function ImpostaAutoRefresh(NuovoValore)
+{
+	if(NuovoValore == null) NuovoValore = document.getElementById("auto-refresh").checked
+
+	document.getElementById("auto-refresh").checked = NuovoValore
+	localStorage.setItem("auto-refresh", NuovoValore)
+
+	if(NuovoValore = true)
+	{
+		ControllaSeMomentoAutoRefresh();
+		TimerAggiornaPagina = setInterval(ControllaSeMomentoAutoRefresh, 30000);
+	} else clearInterval(TimerAggiornaPagina)
 }
 
 function InserisciBoxBiblioteche()
@@ -234,7 +265,7 @@ function InserisciBoxBiblioteche()
 			var ElemOrario = document.createElement("span")
 			ElemOrario.id = "Apertura" + biblioteca.sigla
 			ElemOrario.title = "Orario di apertura"
-			AggiornaOrarioApertura(biblioteca, ElemOrario)
+			AggiornaOrarioApertura(biblioteca, ElemOrario, contenitore)
 			//ElemOrario.innerText = "🕖" + FormattaOrario(biblioteca.OrarioApertura, biblioteca.GiorniChiusura)
 			pulsanti.appendChild(ElemOrario)
 		}
@@ -260,18 +291,18 @@ function InserisciBoxBiblioteche()
 		var AbbiamoCoordinate = (biblioteca.latitudine != "" && biblioteca.longitudine != "")
 		if(biblioteca.indirizzo != "" || AbbiamoCoordinate)
 		{
-			var ElemPosizione = document.createElement("span")
+			var ElemPosizione = document.createElement("a")
+			ElemPosizione.target = "_blank"
+			if(AbbiamoCoordinate) ElemPosizione.href = 'https://www.google.com/maps/search/?api=1&query=' + biblioteca.latitudine + ',' + biblioteca.longitudine
+			else if(biblioteca.indirizzo != "") ElemPosizione.href = 'https://www.google.com/maps/search/?api=1&query=' + biblioteca.indirizzo + ', Pisa'
+
 			ElemPosizione.innerText = "🗺️"
 
-			var ElemLink = document.createElement("a")
-			ElemLink.id = "Distanza" + biblioteca.sigla
-			ElemLink.innerText = "posiz."
-			ElemLink.target = "_blank"
+			var ElemDistanza = document.createElement("span")
+			ElemDistanza.id = "Distanza" + biblioteca.sigla
+			ElemDistanza.innerText = "posiz."
 
-			if(AbbiamoCoordinate) ElemLink.href = 'https://www.google.com/maps/search/?api=1&query=' + biblioteca.latitudine + ',' + biblioteca.longitudine
-			else if(biblioteca.indirizzo != "") ElemLink.href = 'https://www.google.com/maps/search/?api=1&query=' + biblioteca.indirizzo + ', Pisa'
-
-			ElemPosizione.appendChild(ElemLink)
+			ElemPosizione.appendChild(ElemDistanza)
 			pulsanti.appendChild(ElemPosizione)
 		}
 		contenitore.appendChild(pulsanti)
@@ -288,7 +319,7 @@ function InserisciBoxBiblioteche()
 		{
 			Wrapper.style.fontSize = "200%"
 			Wrapper.style.textAlign = "center"
-			Wrapper.style.paddingTop = "100px"
+			Wrapper.style.paddingTop = "33%"
 			Wrapper.innerHTML = "Nessun<br/>dato"
 		}
 		contenitore.appendChild(Wrapper)
@@ -301,41 +332,53 @@ function OrdinaBoxBiblioteche()
 {
 	if(PosizioneUtente != null && document.getElementById("ordina-distanza").checked)
 	{
-		OrdineBiblioteche.sort(function(a, b)
-		{
-			var DistBiblioA = getDistanceFromLatLonInKm(Biblioteche[a].latitudine, Biblioteche[a].longitudine, PosizioneUtente.coords.latitude, PosizioneUtente.coords.longitude)
-			var DistBiblioB = getDistanceFromLatLonInKm(Biblioteche[b].latitudine, Biblioteche[b].longitudine, PosizioneUtente.coords.latitude, PosizioneUtente.coords.longitude)
-			return DistBiblioA - DistBiblioB
-		})
+		OrdineBiblioteche.sort(function(a, b) { return DistanzaBiblioteche[a] - DistanzaBiblioteche[b] })
 
 		var ElemListaBiblio = document.getElementById("ListaBiblio")
-		for(var i=0; i < OrdineBiblioteche.length; i++)
+		for(var i=OrdineBiblioteche.length - 1; i >= 0; i--)
 		{
-			var biblio = Biblioteche[OrdineBiblioteche[i]]
-			var ElemBiblio = document.getElementById("ContenitoreBiblio" + biblio.sigla)
-			ElemListaBiblio.append(ElemBiblio)
+			var BibliotecaCheDovrebbeEsserci = Biblioteche[OrdineBiblioteche[i]]
+			var IDElemCheDovrebbeEsserci = "ContenitoreBiblio" + BibliotecaCheDovrebbeEsserci.sigla
+			var ElemNellaPosizione = ElemListaBiblio.childNodes.item(i)
+			if(ElemNellaPosizione.id != IDElemCheDovrebbeEsserci)
+			{
+				//L'elemento attuale (i-esimo) è fuori posto: bisogna spostarlo
+				var ElemCheDovrebbeEsserci = document.getElementById(IDElemCheDovrebbeEsserci)
+				if(i < OrdineBiblioteche.length - 1) //l'elemento attuale NON è l'ultimo
+				{
+					var ElemSuccessivo = document.getElementById("ContenitoreBiblio" + Biblioteche[OrdineBiblioteche[i+1]].sigla)
+					ElemListaBiblio.insertBefore(ElemCheDovrebbeEsserci, ElemSuccessivo)
+				} else //l'elemento attuale È l'ultimo
+				{
+					ElemListaBiblio.append(ElemCheDovrebbeEsserci)
+				}
+			}
 		}
 	}
 }
 
-function AggiornaOrarioApertura(biblioteca, ElemOrario)
+function AggiornaOrarioApertura(biblioteca, ElemOrario, ElemBiblio)
 {
 	var StatoApertura = StatoAttualeApertura(biblioteca)
+	ElemOrario.style.color = ""
 	if(StatoApertura[0] == true)
 	{
+		ElemBiblio.style.opacity = 1
 		ElemOrario.innerText = "🕖Aperta (per " + DaMinutiAOreMinuti(StatoApertura[1]) + ")"
 		if(StatoApertura[1] > 75) ElemOrario.style.color = "green";
-		else if(StatoApertura[1] > 45) ElemOrario.style.color = "yellow";
+		else if(StatoApertura[1] > 45) ElemOrario.style.color = "orange";
 		else ElemOrario.style.color = "red";
 	}
 	else
 	{
-		if(StatoApertura[1] == -2) { ElemOrario.innerText = "🕖Chiusa permanentemente"; ElemOrario.style.color = "skyblue"; }
-		else if(StatoApertura[1] == -1) { ElemOrario.innerText = "🕖Chiusa oggi"; ElemOrario.style.color = "skyblue"; }
-		else if(StatoApertura[1] == 0) { ElemOrario.innerText = "🕖Chiusa (turno concluso)";
-										ElemOrario.style.color = "skyblue"; } //Turno odierno concluso
-		else ElemOrario.innerText = "🕖Chiusa (aprirà tra " + DaMinutiAOreMinuti(StatoApertura[1]) + ")"
+		ElemBiblio.style.opacity = 0.4
+		if(StatoApertura[1] == -2) ElemOrario.innerText = "🕖Chiusa permanentemente"
+		else if(StatoApertura[1] == -1) ElemOrario.innerText = "🕖Chiusa oggi"
+		else if(StatoApertura[1] == 0) ElemOrario.innerText = "🕖Chiusa (turno concluso)" //Turno odierno concluso
+		else { ElemOrario.innerText = "🕖Chiusa (aprirà tra " + DaMinutiAOreMinuti(StatoApertura[1]) + ")"
+				ElemOrario.style.color = "dodgerblue"; }
 	}
+	return StatoApertura[0]
 }
 
 function DaMinutiAOreMinuti(minuti)
@@ -366,6 +409,9 @@ function FormattaOrario(StringheOrario, GiorniChiusura)
 
 function CaricaFrames()
 {
+	//Se i contenitori delle biblioteche non sono ancora stati generati, esco
+	if(document.getElementById("iframe" + Biblioteche[0].sigla) == null) return;
+
 	document.getElementById("loading-total").innerText = Biblioteche.length
 	document.getElementById("loading-box").style.display = "block"
 	SegnaProgressoCaricamento(0)
@@ -445,10 +491,25 @@ function AggiornaPassaggioTempo()
 
 		ElemAggiornamento.title = "Dati aggiornati alle ore " + OreMinutiDaTimestamp(TimestampUltimoAggiornamento)  + " del " + GiornoMeseAnnoDaTimestamp(TimestampUltimoAggiornamento)
 
-		Biblioteche.forEach(biblio => {
-			AggiornaOrarioApertura(biblio, document.getElementById("Apertura" + biblio.sigla))
-		});
+		AggiornaTuttiOrariApertura()
 	}
+}
+
+function AggiornaTuttiOrariApertura()
+{
+	var NumBiblioAperte = 0
+	var CapienzaBiblioAperte = 0
+	Biblioteche.forEach(biblio => {
+		var aperta = AggiornaOrarioApertura(biblio, document.getElementById("Apertura" + biblio.sigla), document.getElementById("ContenitoreBiblio" + biblio.sigla))
+		if(aperta)
+		{
+			CapienzaBiblioAperte += biblio.capienza;
+			NumBiblioAperte++;
+		}
+	});
+	document.getElementById("capienza-aperte").innerText = CapienzaBiblioAperte
+	document.getElementById("num-biblio-aperte").innerText = NumBiblioAperte
+	document.getElementById("aperture-attuali").style.color = NumBiblioAperte == 0 ? "red" : ""
 }
 
 function ControllaSeMomentoAutoRefresh()
@@ -508,16 +569,19 @@ function MemorizzaPosizioneUtente(posizione)
 	{
 		PosizioneUtente = posizione;
 		document.getElementById("ordina-distanza").disabled = false;
-		Biblioteche.forEach(biblioteca => {
+		for(var i=0; i < Biblioteche.length; i++)
+		{
+			var biblioteca = Biblioteche[i]
 			var AbbiamoCoordinate = (biblioteca.latitudine != "" && biblioteca.longitudine != "")
 			if(AbbiamoCoordinate)
 			{
+				DistanzaBiblioteche[i] = getDistanceFromLatLonInKm(biblioteca.latitudine, biblioteca.longitudine, PosizioneUtente.coords.latitude, PosizioneUtente.coords.longitude)
 				var distanza = DistanzaFormattata([biblioteca.latitudine, biblioteca.longitudine]);
 				var elemento = document.getElementById("Distanza" + biblioteca.sigla);
 				elemento.innerText = distanza
 				elemento.parentElement.title = 'Sei distante ' + distanza + ' dalla biblioteca ' + biblioteca.NomeBreve + '.\nClicca per vedere la mappa';
-			}
-		});
+			} else DistanzaBiblioteche[i] = Number.MAX_SAFE_INTEGER
+		}
 		OrdinaBoxBiblioteche();
 	} else
 	{

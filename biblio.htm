@@ -7,59 +7,67 @@
 	<title>CercaPosti biblioteche UniPi</title>
 </head>
 <body>
-	<!-- HEADER -->
-	<h1>CercaPosti biblioteche UniPi</h1>
+	<div id="header">
+		<!-- TITOLO -->
+		<h1>CercaPosti biblioteche UniPi</h1>
 
-	<!-- AVVISI -->
-	<div id="avviso-nojs" style="color: darkred; background-color: salmon; border: 5px solid darkred" >
-		<h2>Script non caricato!</h2>
-		<p>La tua installazione è corrotta, oppure Javascript è disattivato dal tuo browser.</p>
-		<p>Il CercaPosti non può funzionare.</p>
-	</div>
-
-	<div id="loading-box">
-		Caricamento dati in corso... <span id="loading-done"></span>/<span id="loading-total"></span>
-		<div class="progressbar-esterno">
-			<div class="progressbar-interno">&nbsp;</div>
+		<!-- AVVISI -->
+		<div id="avviso-nojs" style="color: darkred; background-color: salmon; border: 5px solid darkred" >
+			<h2>Script non caricato!</h2>
+			<p>La tua installazione è corrotta, oppure Javascript è disattivato dal tuo browser.</p>
+			<p>Il CercaPosti non può funzionare.</p>
 		</div>
-	</div>
 
-	<!-- TOOLBAR -->
-	<div id="toolbar">
-		<button id="ButtAggiorna" name="Aggiorna i dati delle biblioteche">🔄<br/>Aggiorna</button>
-
-		<label style="text-align: left">
-			<input id="auto-refresh" type="checkbox" />
-			Aggiorna automatica-<br/>mente ogni 5 minuti
-		</label>
-
-		<label style="text-align: left">
-			<input id="ordina-distanza" type="checkbox" disabled />
-			Ordina lista per<br/>distanza
-		</label>
-
-		<!--
-		<div>
-			<label for="ordine">Ordina lista per:</label><br/>
-			<select id="ordine" name="ordine">
-				<option></option>
-				<option value="posti-liberi">Posti liberi</option>
-				<option value="distanza">Distanza</option>
-				<option value="apertura-residua">Durata apertura residua</option>
-			</select>
+		<div id="loading-box">
+			Caricamento dati in corso... <span id="loading-done"></span>/<span id="loading-total"></span>
+			<div class="progressbar-esterno">
+				<div class="progressbar-interno">&nbsp;</div>
+			</div>
 		</div>
-		<div>
-			<h3>Filtri</h3>
-			<label><input type="checkbox" />Escludi biblioteche attualmente chiuse</label><br/>
-			<label><input type="checkbox" />Escludi biblioteche attualmente piene</label>
+
+		<!-- TOOLBAR -->
+		<div id="toolbar">
+			<button id="ButtAggiorna" name="Aggiorna i dati delle biblioteche">🔄<br/>Aggiorna</button>
+
+			<label style="text-align: left">
+				<input id="auto-refresh" type="checkbox" />
+				Aggiorna automatica-<br/>mente ogni 5 minuti
+			</label>
+
+			<label style="text-align: left">
+				<input id="ordina-distanza" type="checkbox" disabled />
+				Ordina lista per<br/>distanza
+			</label>
+
+			<!--
+			<div>
+				<label for="ordine">Ordina lista per:</label><br/>
+				<select id="ordine" name="ordine">
+					<option></option>
+					<option value="posti-liberi">Posti liberi</option>
+					<option value="distanza">Distanza</option>
+					<option value="apertura-residua">Durata apertura residua</option>
+				</select>
+			</div>
+			<div>
+				<h3>Filtri</h3>
+				<label><input type="checkbox" />Escludi biblioteche attualmente chiuse</label><br/>
+				<label><input type="checkbox" />Escludi biblioteche attualmente piene</label>
+			</div>
+			-->
 		</div>
-		-->
 	</div>
 
 	<!-- STATISTICHE GENERALI -->
 	<div id="stat-generali">
 		<p>Dati aggiornati <span id="DataAggiornamento">mai</span></p>
-		<p>Capienza totale <span id="capienza-totale">?</span> posti</p>
+		<p>
+			Attualmente aperte:<br/>
+			<span id="aperture-attuali">
+				<span id="num-biblio-aperte">?</span> biblioteche su <span id="num-biblio-totali">?</span><br/>
+				(capienza <span id="capienza-aperte">?</span> posti su <span id="capienza-totale">?</span>)
+			</span>
+		</p>
 		<!--<p>Posto più vicino: 6km</p>-->
 	</div>
 

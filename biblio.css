@@ -1,14 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Francois+One&display=swap');
 
-body { font-family: sans-serif; }
+body { font-family: sans-serif; margin: 0; }
 h1 { font-family: "Francois One", Helvetica, sans-serif; font-size: 2.2em }
 h1, h2 { text-align: center; }
+h1 { margin-block-start: 0 }
+h2 { margin-block-end: 0.2em; }
 a { text-decoration: none; }
-p { margin-block-start: 0; margin-block-end: 0; margin-top: 0.5em; margin-bottom: 0.5em; }
+p { margin-block-start: 0; margin-block-end: 0; padding-top: 0.5em; padding-bottom: 0.5em; }
 a:hover { text-decoration: underline; }
 label, input, select, button { cursor: pointer; font-size: 100%; }
 input[type=checkbox] { zoom: 2; float: left; height: 100%; margin-right: 0.2em !important; }
 input[type=checkbox]:disabled { cursor: not-allowed; }
+
+#header {
+			background-color: rgba(128, 128, 128, 0.2);
+			padding: 0.5em 0;
+		}
 
 #toolbar {
 			display: flex;
@@ -56,7 +63,8 @@ input[type=checkbox]:disabled { cursor: not-allowed; }
 iframe { border: none; height: 2000px; width: 100%; overflow-y: visible; }
 
 #DataAggiornamento { font-weight: bold; }
-#footer { opacity: 0.6; text-align: center; background-color: rgba(128, 128, 128, 0.3) }
+#num-biblio-aperte, #capienza-aperte { font-weight: bold; font-size: 120%; }
+#footer { margin-top: 0.8em; opacity: 0.6; text-align: center; background-color: rgba(128, 128, 128, 0.3) }
 
 #loading-box {
 				display: none;
@@ -95,7 +103,7 @@ button { background-color: gainsboro; color: black; }
 {
 	body { background-color: #111111; color: white; }
 	h1, h2 { color: dodgerblue; }
-	a { color: goldenrod; }
+	a { color: lightgoldenrodyellow; }
 	button { background-color: #333333; color: white; }
 	.progressbar-esterno { background-color: #111111; }
 }
