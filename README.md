@@ -24,4 +24,4 @@ Tuttavia si fa presente che, in modalità locale, alcuni browser non consentono 
 
 ## Riconoscimenti
 * Throbber: <a href="https://loading.io/asset/475308" target="_blank">loading.io</a>, free license
-* Font titolo: <a href="https://fonts.google.com/specimen/Francois+One" target="_blank">Vernon Adams</a>, Open Font License
+* Font titolo: <a href="https://fonts.google.com/specimen/Baloo+Bhaijaan+2" target="_blank">Ek Type</a>, Open Font License

@@ -1,16 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Francois+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2&display=swap');
 
 body { font-family: sans-serif; margin: 0; }
-h1 { font-family: "Francois One", Helvetica, sans-serif; font-size: 2.2em }
+h1 { font-family: "Baloo Bhaijaan 2", Helvetica, sans-serif; font-size: 2.2em }
 h1, h2 { text-align: center; }
-h1 { margin-block-start: 0 }
+h1 { margin-block-start: 0; margin-block-end: 0; }
 h2 { margin-block-end: 0.2em; }
 a { text-decoration: none; }
 p { margin-block-start: 0; margin-block-end: 0; padding-top: 0.5em; padding-bottom: 0.5em; }
 a:hover { text-decoration: underline; }
-label, input, select, button { cursor: pointer; font-size: 100%; }
-input[type=checkbox] { zoom: 2; float: left; height: 100%; margin-right: 0.2em !important; }
+label, input, select, button { font-size: 100%; }
+label { font-weight: normal !important; cursor: pointer; }
+button { cursor: pointer; border: 1px solid gray; background-color: whitesmoke; }
+button:hover { border: 1px solid black; background-color: lightgray; }
+input[type=checkbox] { cursor: pointer; zoom: 2; float: left; margin-right: 0.2em !important; filter:hue-rotate(140deg); }
 input[type=checkbox]:disabled { cursor: not-allowed; }
+.slider:hover { cursor: pointer; }
+input[type=range]:disabled:hover { cursor: not-allowed; }
+input[type=range]:disabled::-webkit-slider-thumb { cursor: not-allowed; }
+.slider::-webkit-slider-thumb {
+								-webkit-appearance: none;
+								appearance: none;
+								width: 25px;
+								height: 25px;
+								background: grey;
+								cursor: pointer;
+								border-radius: 12px;
+								}
 
 #header {
 			background-color: rgba(128, 128, 128, 0.2);
@@ -26,8 +41,6 @@ input[type=checkbox]:disabled { cursor: not-allowed; }
 			margin: 0.5em 0;
 			text-align: center;
 		}
-
-#toolbar * { margin: 0 0.5em }
 
 #stat-generali {
 					width: fit-content;
@@ -45,10 +58,14 @@ input[type=checkbox]:disabled { cursor: not-allowed; }
 				place-content: space-evenly;
 			}
 
-.ContenitoreBiblio { width: 250px; }
+.ContenitoreBiblio { width: 250px; display: inline-block; }
+.ContenitoreBiblio:hover { opacity: 1 !important }
 
-.PulsantiBiblio { text-align: center }
-.PulsantiBiblio * { margin-right: 0.5em; white-space: nowrap; }
+.InfoSinteticheBiblio { text-align: center }
+.InfoSinteticheBiblio * { margin-right: 0.5em; white-space: nowrap; }
+
+.InfoDettagliateBiblio { padding: 0.5em; border-radius: 10px; background-color: rgba(128, 128, 128, 0.4); }
+.FrameOSM { width: 100%; height: 250px; }
 
 .WrapperIframe {
 				width: 250px;
@@ -60,7 +77,7 @@ input[type=checkbox]:disabled { cursor: not-allowed; }
 				background-position: center;
 			}
 
-iframe { border: none; height: 2000px; width: 100%; overflow-y: visible; }
+.FrameGraficoPosti { border: none; height: 2000px; width: 100%; overflow-y: visible; }
 
 #DataAggiornamento { font-weight: bold; }
 #num-biblio-aperte, #capienza-aperte { font-weight: bold; font-size: 120%; }
@@ -70,16 +87,18 @@ iframe { border: none; height: 2000px; width: 100%; overflow-y: visible; }
 				display: none;
 				width: fit-content;
 				margin: 0.5em auto 0.5em auto;
-				border-radius: 14px;
+				border: 2px solid goldenrod;
+				border-radius: 10px;
 				font-weight: bold;
 				background-color: gold;
 				text-align: center;
 				color: black;
-				padding: 5px;
+				padding: 0.5em 1em;
 			}
 
-.progressbar-esterno { height: 1.5em; width: 15em; border: 2px solid gray; padding: 0; margin: auto; }
+.progressbar-esterno { height: 1.5em; width: 15em; border: 2px solid gray; padding: 0; margin: auto; position: relative; }
 .progressbar-interno { height: 100%; background-color: limegreen; margin: 0; }
+.progressbar-valore { color: gray; width: 100%; height: 100%; text-align: center; vertical-align: middle; position: absolute; left: 0; top: 0.2em; }
 
 /* Applico di default il tema giorno, per i browser che non supportano "prefers-color-scheme" */
 body { background-color: white; color: black; }

@@ -12,29 +12,36 @@
 		<h1>CercaPosti biblioteche UniPi</h1>
 
 		<!-- AVVISI -->
-		<div id="avviso-nojs" style="color: darkred; background-color: salmon; border: 5px solid darkred" >
+		<div id="avviso-nojs" style="color: darkred; background-color: salmon; border: 5px solid darkred; text-align: center; margin: auto" >
 			<h2>Script non caricato!</h2>
 			<p>La tua installazione è corrotta, oppure Javascript è disattivato dal tuo browser.</p>
 			<p>Il CercaPosti non può funzionare.</p>
 		</div>
 
 		<div id="loading-box">
-			Caricamento dati in corso... <span id="loading-done"></span>/<span id="loading-total"></span>
+			Caricamento dati in corso...
 			<div class="progressbar-esterno">
 				<div class="progressbar-interno">&nbsp;</div>
+				<div class="progressbar-valore"><span id="loading-done"></span>/<span id="loading-total"></div>
 			</div>
 		</div>
 
 		<!-- TOOLBAR -->
 		<div id="toolbar">
-			<button id="ButtAggiorna" name="Aggiorna i dati delle biblioteche">🔄<br/>Aggiorna</button>
+			<button id="ButtAggiorna" name="Aggiorna i dati delle biblioteche" style="margin: 0 0.5em">🔄<br/>Aggiorna</button>
 
-			<label style="text-align: left">
-				<input id="auto-refresh" type="checkbox" />
-				Aggiorna automatica-<br/>mente ogni 5 minuti
-			</label>
+			<fieldset id="FormAutoRefresh" style="margin: 0 0.5em; padding: 0 0 0 0; border: none;">
+				<label style="float: left">
+					<input id="auto-refresh" type="checkbox" />
+					Aggiorna automa-<br/>ticamente ogni:
+				</label>
+				<div id="FormFrequenza" style="float: left; padding-top: 0.5em">
+					<input id="FrequenzaSlider" class="slider" type="range" min="0" max="6" value="2" style="display: inline-block; width: 100%; -webkit-appearance: none; background: #005CC8; height: 15px; border-radius: 7px;" />
+					<div id="FrequenzaLabel" style="text-align: center; width: 100%; font-weight: bold; color: #005CC8;">5 minuti</div>
+				</div>
+			</fieldset>
 
-			<label style="text-align: left">
+			<label title="Il tuo browser ha negato l'accesso alla posizione" style="margin: 0 0.5em; text-align: left; opacity: 0.5; cursor: not-allowed;">
 				<input id="ordina-distanza" type="checkbox" disabled />
 				Ordina lista per<br/>distanza
 			</label>
@@ -64,7 +71,7 @@
 		<p>
 			Attualmente aperte:<br/>
 			<span id="aperture-attuali">
-				<span id="num-biblio-aperte">?</span> biblioteche su <span id="num-biblio-totali">?</span><br/>
+				<span id="num-biblio-aperte">?</span> biblioteche su <span id="num-biblio-totali">?</span> 
 				(capienza <span id="capienza-aperte">?</span> posti su <span id="capienza-totale">?</span>)
 			</span>
 		</p>
@@ -89,7 +96,8 @@
 			<a href="https://www.sba.unipi.it/" target="_blank">Sistema Bibliotecario di Ateneo</a> e già pubblicamente accessibili sul suo sito.
 		</p>
 
-		<p>Throbber: <a href="https://loading.io/asset/475308" target="_blank">loading.io</a>, free license | Font titolo: <a href="https://fonts.google.com/specimen/Francois+One" target="_blank">Vernon Adams</a>, Open Font License</p>
+		<p>Throbber: <a href="https://loading.io/asset/475308" target="_blank">loading.io</a>, free license |
+			Font titolo: <a href="https://fonts.google.com/specimen/Baloo+Bhaijaan+2" target="_blank">Ek Type</a>, Open Font License</p>
 	</div>
 
 	<script src="biblio.js"></script>

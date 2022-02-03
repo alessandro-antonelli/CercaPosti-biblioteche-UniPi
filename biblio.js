@@ -1,4 +1,4 @@
-const versione = "1.2"
+const versione = "1.3"
 const UrlBaseGraficiPosti = "https://qrbiblio.unipi.it/Home/Chart?IdCat="
 var PosizioneUtente
 var TimestampUltimoAggiornamento = 0;
@@ -17,9 +17,9 @@ const Biblioteche = [
 							OrarioApertura: [9, 0, 20, 0],
 							GiorniChiusura: [6, 0],
 							indirizzo: "Via del Borghetto 80",
-							latitudine: "43.7119425",
-							longitudine: "10.411518",
-							url: "http://www.sba.unipi.it/it/biblioteche/polo-1/agraria"
+							latitudine: 43.7119425,
+							longitudine: 10.411518,
+							url: "https://www.sba.unipi.it/it/biblioteche/polo-1/agraria"
 						},
 						{	sigla: "ECO",
 							NomeBreve: "Economia",
@@ -29,9 +29,9 @@ const Biblioteche = [
 							OrarioApertura: null,
 							GiorniChiusura: [0,1,2,3,4,5,6],
 							indirizzo: "Via Cosimo Ridolfi 10",
-							latitudine: "43.71119680445201",
-							longitudine: "10.410463494623068",
-							url: "http://www.sba.unipi.it/it/biblioteche/polo-1/economia"
+							latitudine: 43.71119680445201,
+							longitudine: 10.410463494623068,
+							url: "https://www.sba.unipi.it/it/biblioteche/polo-1/economia"
 						},
 						{	sigla: "VET",
 							NomeBreve: "Veterinaria",
@@ -41,9 +41,9 @@ const Biblioteche = [
 							OrarioApertura: [9, 0, 20, 0],
 							GiorniChiusura: [6,0],
 							indirizzo: "Viale delle Piagge 2",
-							latitudine: "43.70694",
-							longitudine: "10.41297",
-							url: "http://www.sba.unipi.it/it/biblioteche/polo-1/medicina-veterinaria"
+							latitudine: 43.70694,
+							longitudine: 10.41297,
+							url: "https://www.sba.unipi.it/it/biblioteche/polo-1/medicina-veterinaria"
 						},
 						{	sigla: "GIU",
 							NomeBreve: "Giurisprudenza",
@@ -53,9 +53,9 @@ const Biblioteche = [
 							OrarioApertura: [9, 0, 20, 0],
 							GiorniChiusura: [6, 0],
 							indirizzo: "Palazzo La Sapienza, Via Curtatone e Montanara 15",
-							latitudine: "43.7173353",
-							longitudine: "10.3973234",
-							url: "http://www.sba.unipi.it/it/biblioteche/polo-2/giurisprudenza"
+							latitudine: 43.7173353,
+							longitudine: 10.3973234,
+							url: "https://www.sba.unipi.it/it/biblioteche/polo-2/giurisprudenza"
 						},
 						{	sigla: "CHI",
 							NomeBreve: "Chimica",
@@ -65,9 +65,9 @@ const Biblioteche = [
 							OrarioApertura: [9, 0, 20, 0],
 							GiorniChiusura: [6, 0],
 							indirizzo: "Via Moruzzi 13",
-							latitudine: "43.71742660188611",
-							longitudine: "10.42718640847391",
-							url: "http://www.sba.unipi.it/it/biblioteche/polo-3/chimica"
+							latitudine: 43.71742660188611,
+							longitudine: 10.42718640847391,
+							url: "https://www.sba.unipi.it/it/biblioteche/polo-3/chimica"
 						},
 						{	sigla: "MIF",
 							NomeBreve: "Matematica",
@@ -77,9 +77,9 @@ const Biblioteche = [
 							OrarioApertura: [9, 0, 20, 0],
 							GiorniChiusura: [6, 0],
 							indirizzo: "Polo Fibonacci, Largo Bruno Pontecorvo 3",
-							latitudine: "43.72098398202726",
-							longitudine: "10.407881847439574",
-							url: "http://www.sba.unipi.it/it/biblioteche/polo-3/matematica-informatica-fisica"
+							latitudine: 43.72098398202726,
+							longitudine: 10.407881847439574,
+							url: "https://www.sba.unipi.it/it/biblioteche/polo-3/matematica-informatica-fisica"
 						},
 						{	sigla: "SNA",
 							NomeBreve: "Biologia",
@@ -89,9 +89,9 @@ const Biblioteche = [
 							OrarioApertura: [9, 0, 20, 0],
 							GiorniChiusura: [6,0],
 							indirizzo: "Via Derna 1",
-							latitudine: "43.7185734",
-							longitudine: "10.3952457",
-							url: "http://www.sba.unipi.it/it/biblioteche/polo-3/scienze-naturali-e-ambientali"
+							latitudine: 43.7185734,
+							longitudine: 10.3952457,
+							url: "https://www.sba.unipi.it/it/biblioteche/polo-3/scienze-naturali-e-ambientali"
 						},
 						{	sigla: "MED",
 							NomeBreve: "Medicina",
@@ -101,9 +101,9 @@ const Biblioteche = [
 							OrarioApertura: [9, 0, 20, 0],
 							GiorniChiusura: [6,0],
 							indirizzo: "Ospedale Santa Chiara edificio 7, Via Savi 10",
-							latitudine: "43.7199274",
-							longitudine: "10.3935864",
-							url: "http://www.sba.unipi.it/it/biblioteche/polo-4/medicina-e-chirurgia-farmacia"
+							latitudine: 43.7199274,
+							longitudine: 10.3935864,
+							url: "https://www.sba.unipi.it/it/biblioteche/polo-4/medicina-e-chirurgia-farmacia"
 						},
 						{	sigla: "ING",
 							NomeBreve: "Ingegneria",
@@ -113,9 +113,9 @@ const Biblioteche = [
 							OrarioApertura: [9, 0, 20, 0],
 							GiorniChiusura: [6,0],
 							indirizzo: "Largo Lucio Lazzarino 1",
-							latitudine: "43.721135",
-							longitudine: "10.389622",
-							url: "http://www.sba.unipi.it/it/biblioteche/polo-5/ingegneria"
+							latitudine: 43.721135,
+							longitudine: 10.389622,
+							url: "https://www.sba.unipi.it/it/biblioteche/polo-5/ingegneria"
 						},
 						{	sigla: "ANG",
 							NomeBreve: "Anglistica",
@@ -125,9 +125,9 @@ const Biblioteche = [
 							OrarioApertura: [9, 0, 18, 0],
 							GiorniChiusura: [6,0],
 							indirizzo: "Via Santa Maria 67",
-							latitudine: "43.7189526",
-							longitudine: "10.397341",
-							url: "http://www.sba.unipi.it/it/biblioteche/polo-6/anglistica"
+							latitudine: 43.7189526,
+							longitudine: 10.397341,
+							url: "https://www.sba.unipi.it/it/biblioteche/polo-6/anglistica"
 						},
 						{	sigla: "ANT",
 							NomeBreve: "Antichistica",
@@ -137,9 +137,9 @@ const Biblioteche = [
 							OrarioApertura: [9, 0, 20, 0],
 							GiorniChiusura: [6, 0],
 							indirizzo: "Via Santa Maria 44",
-							latitudine: "43.719499131535336",
-							longitudine: "10.397896646166586",
-							url: "http://www.sba.unipi.it/it/biblioteche/polo-6/antichistica-linguistica-germanistica-slavistica"
+							latitudine: 43.719499131535336,
+							longitudine: 10.397896646166586,
+							url: "https://www.sba.unipi.it/it/biblioteche/polo-6/antichistica-linguistica-germanistica-slavistica"
 						},
 						{	sigla: "FIL",
 							NomeBreve: "Filosofia",
@@ -149,9 +149,9 @@ const Biblioteche = [
 							OrarioApertura: [9, 0, 20, 0],
 							GiorniChiusura: [6,0],
 							indirizzo: "Palazzo Carità, Via Pasquale Paoli 9",
-							latitudine: "43.7183695",
-							longitudine: "10.3988073",
-							url: "http://www.sba.unipi.it/it/biblioteche/polo-6/filosofia-e-storia"
+							latitudine: 43.7183695,
+							longitudine: 10.3988073,
+							url: "https://www.sba.unipi.it/it/biblioteche/polo-6/filosofia-e-storia"
 						},
 						{	sigla: "ITA",
 							NomeBreve: "Italianistica",
@@ -161,9 +161,9 @@ const Biblioteche = [
 							OrarioApertura: [9, 0, 20, 0],
 							GiorniChiusura: [6,0],
 							indirizzo: "Palazzo Matteucci, Piazza Torricelli 2",
-							latitudine: "43.717907",
-							longitudine: "10.3981708",
-							url: "http://www.sba.unipi.it/it/biblioteche/polo-6/italianistica-romanistica"
+							latitudine: 43.717907,
+							longitudine: 10.3981708,
+							url: "https://www.sba.unipi.it/it/biblioteche/polo-6/italianistica-romanistica"
 						},
 						{	sigla: "ART",
 							NomeBreve: "Arte",
@@ -173,9 +173,9 @@ const Biblioteche = [
 							OrarioApertura: [9, 0, 20, 0],
 							GiorniChiusura: [6,0],
 							indirizzo: "Via Nicola Pisano, 40/A",
-							latitudine: "43.7172601",
-							longitudine: "10.3926523",
-							url: "http://www.sba.unipi.it/it/biblioteche/polo-6/storia-delle-arti"
+							latitudine: 43.7172601,
+							longitudine: 10.3926523,
+							url: "https://www.sba.unipi.it/it/biblioteche/polo-6/storia-delle-arti"
 						}
 					]
 
@@ -204,8 +204,10 @@ const Biblioteche = [
 
 function CaricaImpostazioni()
 {
-	if(localStorage.getItem("auto-refresh") != null) ImpostaAutoRefresh(localStorage.getItem("auto-refresh"))
-	if(localStorage.getItem("ordina-distanza") != null) ImpostaOrdinamentoLista(localStorage.getItem("ordina-distanza"))
+	var ImpostazAutoRefresh = (localStorage.getItem("auto-refresh") == "true")
+	var ImpostazFrequenza = localStorage.getItem("frequenza")
+	ImpostaAutoRefresh(ImpostazAutoRefresh, ImpostazFrequenza)
+	if(localStorage.getItem("ordina-distanza") != null) ImpostaOrdinamentoLista(localStorage.getItem("ordina-distanza") == "true")
 }
 
 function RegistraHandler()
@@ -216,7 +218,8 @@ function RegistraHandler()
 		else { AggiornaPassaggioTempo(); TimerAggiornaScritteTempo = setInterval(AggiornaPassaggioTempo, 10000); }
 	} );
 	document.getElementById("ButtAggiorna").addEventListener("click", CaricaFrames)
-	document.getElementById("auto-refresh").addEventListener("click", ImpostaAutoRefresh.bind(null, null))
+	document.getElementById("auto-refresh").addEventListener("click", ImpostaAutoRefresh.bind(null, null, null))
+	document.getElementById('FrequenzaSlider').addEventListener('input', ImpostaAutoRefresh.bind(null, null, null));
 	document.getElementById("ordina-distanza").addEventListener("click", ImpostaOrdinamentoLista.bind(null, null))
 }
 
@@ -230,82 +233,186 @@ function ImpostaOrdinamentoLista(NuovoValore)
 	if(NuovoValore = true) OrdinaBoxBiblioteche()
 }
 
-function ImpostaAutoRefresh(NuovoValore)
+function ImpostaAutoRefresh(NuovoValAbilitazione, NuovoValLivelloFrequenza)
 {
-	if(NuovoValore == null) NuovoValore = document.getElementById("auto-refresh").checked
+	var CheckBox = document.getElementById("auto-refresh");
+	var FormFrequenza = document.getElementById("FormFrequenza");
+	var Slider = document.getElementById('FrequenzaSlider');
+	var LabelSlider = document.getElementById('FrequenzaLabel');
 
-	document.getElementById("auto-refresh").checked = NuovoValore
-	localStorage.setItem("auto-refresh", NuovoValore)
+	if(NuovoValAbilitazione == null) NuovoValAbilitazione = CheckBox.checked
+	if(NuovoValLivelloFrequenza == null) NuovoValLivelloFrequenza = Slider.value
 
-	if(NuovoValore = true)
+	CheckBox.checked = NuovoValAbilitazione
+	FormFrequenza.style.opacity = (NuovoValAbilitazione == true ? 1 : 0.3)
+	Slider.disabled = !NuovoValAbilitazione
+	localStorage.setItem("auto-refresh", NuovoValAbilitazione)
+
+	Slider.value = NuovoValLivelloFrequenza;
+	localStorage.setItem('frequenza', NuovoValLivelloFrequenza);
+
+	var FrequenzaMinuti;
+	if(NuovoValLivelloFrequenza == 0)
 	{
+		LabelSlider.innerHTML = '1 minuto';
+		LabelSlider.style.color = 'red';
+		Slider.style.background = 'red';
+		FrequenzaMinuti = 1;
+	} else if(NuovoValLivelloFrequenza == 1)
+	{
+		LabelSlider.innerHTML = '2 minuti';
+		LabelSlider.style.color = 'orange';
+		Slider.style.background = 'yellow';
+		FrequenzaMinuti = 2;
+	} else if(NuovoValLivelloFrequenza == 2)
+	{
+		LabelSlider.innerHTML = '5 minuti';
+		LabelSlider.style.color = '#005CC8';
+		Slider.style.background = '#005CC8';
+		FrequenzaMinuti = 5;
+	} else if(NuovoValLivelloFrequenza == 3)
+	{
+		LabelSlider.innerHTML = '10 minuti';
+		LabelSlider.style.color = 'green';
+		Slider.style.background = '#3EBE00';
+		FrequenzaMinuti = 10;
+	} else if(NuovoValLivelloFrequenza == 4)
+	{
+		LabelSlider.innerHTML = '15 minuti';
+		LabelSlider.style.color = '#3EBE00';
+		Slider.style.background = 'limegreen';
+		FrequenzaMinuti = 15;
+	} else if(NuovoValLivelloFrequenza == 5)
+	{
+		LabelSlider.innerHTML = '30 minuti';
+		LabelSlider.style.color = 'limegreen';
+		Slider.style.background = 'lawngreen';
+		FrequenzaMinuti = 30;
+	} else if(NuovoValLivelloFrequenza == 6)
+	{
+		LabelSlider.innerHTML = '1 ora';
+		LabelSlider.style.color = '#4de34d';
+		Slider.style.background = '#6ee86e';
+		FrequenzaMinuti = 60;
+	}
+
+	if(NuovoValAbilitazione == true)
+	{
+		if(TimerAggiornaPagina != null) clearInterval(TimerAggiornaPagina)
+		TimerAggiornaPagina = setInterval(ControllaSeMomentoAutoRefresh, FrequenzaMinuti * 60000 / 10);
+
 		ControllaSeMomentoAutoRefresh();
-		TimerAggiornaPagina = setInterval(ControllaSeMomentoAutoRefresh, 30000);
-	} else clearInterval(TimerAggiornaPagina)
+	}
+	else if(TimerAggiornaPagina != null)
+	{
+		clearInterval(TimerAggiornaPagina)
+	}
+}
+
+function ApriChiudiInfoDettagliate(biblioteca)
+{
+	var ElemInfoDettagliate = document.getElementById("InfoDettagliate" + biblioteca.sigla)
+	var StatoPrecedente = ElemInfoDettagliate.style.display
+	ElemInfoDettagliate.style.display = (StatoPrecedente == "none" ? "block" : "none")
+	if(document.getElementById("OSM" + biblioteca.sigla) == null &&
+		biblioteca.longitudine != null && biblioteca.latitudine != null)
+			{ ElemInfoDettagliate.appendChild(GeneraCodiceOSM(biblioteca)) }
+	document.getElementById("ContenitoreBiblio" + biblioteca.sigla).style.cursor = (StatoPrecedente == "none" ? "zoom-out" : "zoom-in")
 }
 
 function InserisciBoxBiblioteche()
 {
 	Biblioteche.forEach(biblioteca => {
 		var contenitore = document.createElement('div')
-		contenitore.style.display = "inline-block"
-		contenitore.classList = "ContenitoreBiblio"
 		contenitore.id = "ContenitoreBiblio" + biblioteca.sigla
+		contenitore.classList = "ContenitoreBiblio"
+		contenitore.style.cursor = "zoom-in"
+		contenitore.addEventListener("click", ApriChiudiInfoDettagliate.bind(null, biblioteca))
 
 		var titolo = document.createElement("h2")
 		titolo.innerText = biblioteca.NomeBreve
 		titolo.title = biblioteca.NomeCompleto
 		contenitore.appendChild(titolo)
 
-		var pulsanti = document.createElement("div")
-		pulsanti.className = "PulsantiBiblio"
+		var InfoSintetiche = document.createElement("div")
+		InfoSintetiche.id = "InfoSintetiche" + biblioteca.sigla
+		InfoSintetiche.className = "InfoSinteticheBiblio"
+
+		var InfoDettagliate = document.createElement("div")
+		InfoDettagliate.id = "InfoDettagliate" + biblioteca.sigla
+		InfoDettagliate.className = "InfoDettagliateBiblio"
+		InfoDettagliate.style.display = "none"
+
+		var NomeCompleto = document.createElement("div")
+		NomeCompleto.innerText = biblioteca.NomeCompleto
+		NomeCompleto.style.textAlign = "center"
+		NomeCompleto.style.fontStyle = "italic"
+		NomeCompleto.style.fontWeight = "bold"
+		InfoDettagliate.appendChild(NomeCompleto)
 
 		if(biblioteca.GiorniChiusura != null)
 		{
-			var ElemOrario = document.createElement("span")
-			ElemOrario.id = "Apertura" + biblioteca.sigla
-			ElemOrario.title = "Orario di apertura"
-			AggiornaOrarioApertura(biblioteca, ElemOrario, contenitore)
-			//ElemOrario.innerText = "🕖" + FormattaOrario(biblioteca.OrarioApertura, biblioteca.GiorniChiusura)
-			pulsanti.appendChild(ElemOrario)
+			var ElemStatoApertura = document.createElement("span")
+			ElemStatoApertura.id = "Apertura" + biblioteca.sigla
+			ElemStatoApertura.title = "Attuale stato di apertura della biblioteca " + biblioteca.NomeBreve
+			AggiornaOrarioApertura(biblioteca, ElemStatoApertura, contenitore)
+			InfoSintetiche.appendChild(ElemStatoApertura)
+
+			var ElemOrario = document.createElement("div")
+			ElemOrario.innerText = "🕖Orario: " + FormattaOrario(biblioteca.OrarioApertura, biblioteca.GiorniChiusura)
+			InfoDettagliate.appendChild(ElemOrario)
 		}
 
 		if(biblioteca.capienza != null)
 		{
-			var ElemCapienza = document.createElement("span")
-			ElemCapienza.innerText = "🪑" + biblioteca.capienza
+			var ElemCapienza = document.createElement("div")
+			ElemCapienza.innerText = "🪑Capienza " + biblioteca.capienza + " posti"
 			ElemCapienza.title = "Capienza massima"
-			pulsanti.appendChild(ElemCapienza)
+			InfoDettagliate.appendChild(ElemCapienza)
 		}
 
 		if(biblioteca.url != "")
 		{
 			var ElemSito = document.createElement("a")
-			ElemSito.innerText = "🌐web"
-			ElemSito.title = "Sito web"
+			ElemSito.style.display = "inline-block"
+			ElemSito.innerText = "🌐Sito web"
 			ElemSito.href = biblioteca.url
 			ElemSito.target = "_blank"
-			pulsanti.appendChild(ElemSito)
+			InfoDettagliate.appendChild(ElemSito)
 		}
 
-		var AbbiamoCoordinate = (biblioteca.latitudine != "" && biblioteca.longitudine != "")
+		var AbbiamoCoordinate = (biblioteca.latitudine != null && biblioteca.longitudine != null)
+		if(AbbiamoCoordinate)
+		{
+			var ElemDistanza = document.createElement("span")
+			ElemDistanza.style.display = "none"
+			ElemDistanza.innerText = "🚗"
+			ElemDistanza.title = "Distanza della biblioteca dalla tua posizione (in linea d'aria)"
+			var ElemCifraDistanza = document.createElement("span")
+			ElemCifraDistanza.id = "Distanza" + biblioteca.sigla
+			ElemCifraDistanza.innerText = "? m"
+			ElemDistanza.appendChild(ElemCifraDistanza)
+			InfoSintetiche.appendChild(ElemDistanza)
+		}
+
 		if(biblioteca.indirizzo != "" || AbbiamoCoordinate)
 		{
-			var ElemPosizione = document.createElement("a")
-			ElemPosizione.target = "_blank"
-			if(AbbiamoCoordinate) ElemPosizione.href = 'https://www.google.com/maps/search/?api=1&query=' + biblioteca.latitudine + ',' + biblioteca.longitudine
-			else if(biblioteca.indirizzo != "") ElemPosizione.href = 'https://www.google.com/maps/search/?api=1&query=' + biblioteca.indirizzo + ', Pisa'
+			var ElemPosizione = document.createElement("div")
+			if(biblioteca.indirizzo != "") ElemPosizione.innerText = "📍" + biblioteca.indirizzo
 
-			ElemPosizione.innerText = "🗺️"
-
-			var ElemDistanza = document.createElement("span")
-			ElemDistanza.id = "Distanza" + biblioteca.sigla
-			ElemDistanza.innerText = "posiz."
-
-			ElemPosizione.appendChild(ElemDistanza)
-			pulsanti.appendChild(ElemPosizione)
+			var ElemLinkGMaps = document.createElement("a")
+			ElemLinkGMaps.style.marginLeft = "0.2em"
+			ElemLinkGMaps.style.whiteSpace = "nowrap"
+			ElemLinkGMaps.target = "_blank"
+			if(AbbiamoCoordinate) ElemLinkGMaps.href = 'https://www.google.com/maps/search/?api=1&query=' + biblioteca.latitudine + ',' + biblioteca.longitudine
+			else if(biblioteca.indirizzo != "") ElemLinkGMaps.href = 'https://www.google.com/maps/search/?api=1&query=' + biblioteca.indirizzo + ', Pisa'
+			ElemLinkGMaps.innerText = "🗺️apri mappa"
+				
+			ElemPosizione.appendChild(ElemLinkGMaps)
+			InfoDettagliate.appendChild(ElemPosizione)
 		}
-		contenitore.appendChild(pulsanti)
+		contenitore.appendChild(InfoSintetiche)
+		contenitore.appendChild(InfoDettagliate)
 
 		var Wrapper = document.createElement('div') 
 		if(biblioteca.IDGraficoPosti != "")
@@ -314,18 +421,37 @@ function InserisciBoxBiblioteche()
 
 			var iframe = document.createElement('iframe');
 			iframe.id = "iframe" + biblioteca.sigla
+			iframe.className = "FrameGraficoPosti"
 			Wrapper.appendChild(iframe)
 		} else
 		{
 			Wrapper.style.fontSize = "200%"
 			Wrapper.style.textAlign = "center"
-			Wrapper.style.paddingTop = "33%"
+			Wrapper.style.paddingTop = "0.5em"
 			Wrapper.innerHTML = "Nessun<br/>dato"
 		}
 		contenitore.appendChild(Wrapper)
 
 		document.getElementById("ListaBiblio").appendChild(contenitore)
 	});
+}
+
+function GeneraCodiceOSM(biblioteca)
+{
+	var LatSopra = biblioteca.latitudine - 0.005
+	var LatSotto = biblioteca.latitudine + 0.005
+	var LongSX = biblioteca.longitudine - 0.005
+	var LongDX = biblioteca.longitudine + 0.005
+
+	var FrameOSM = document.createElement("iframe")
+	FrameOSM.id = "OSM" + biblioteca.sigla
+	FrameOSM.className = "FrameOSM"
+	FrameOSM.src = `https://www.openstreetmap.org/export/embed.html?bbox=${LongSX}%2C${LatSopra}%2C${LongDX}%2C${LatSotto}&layer=mapnik&marker=${biblioteca.latitudine}%2C${biblioteca.longitudine}`
+	FrameOSM.frameBorder = "0"
+	FrameOSM.scrolling = "no"
+	FrameOSM.marginHeight = "0"
+	FrameOSM.marginWidth = "0"
+	return FrameOSM
 }
 
 function OrdinaBoxBiblioteche()
@@ -365,7 +491,7 @@ function AggiornaOrarioApertura(biblioteca, ElemOrario, ElemBiblio)
 	{
 		ElemBiblio.style.opacity = 1
 		ElemOrario.innerText = "🕖Aperta (per " + DaMinutiAOreMinuti(StatoApertura[1]) + ")"
-		if(StatoApertura[1] > 75) ElemOrario.style.color = "green";
+		if(StatoApertura[1] > 75) ElemOrario.style.color = "limegreen";
 		else if(StatoApertura[1] > 45) ElemOrario.style.color = "orange";
 		else ElemOrario.style.color = "red";
 	}
@@ -389,8 +515,7 @@ function DaMinutiAOreMinuti(minuti)
 
 function FormattaOrario(StringheOrario, GiorniChiusura)
 {
-	//if(GiorniChiusura.count == 7) return "Chiusa permanentemente"
-	if(GiorniChiusura.includes( (new Date()).getDay() ) ) return "Chiusa" //solo oggi
+	if(GiorniChiusura.length == 7) return "Sempre chiusa"
 
 	var RetVal = StringheOrario[0]
 	if(StringheOrario[1] != 0)
@@ -404,6 +529,22 @@ function FormattaOrario(StringheOrario, GiorniChiusura)
 		if(StringheOrario[3] >= 10) RetVal += ":" + StringheOrario[3]
 		else RetVal += ":0" + StringheOrario[3]
 	}
+
+	if(GiorniChiusura != null && GiorniChiusura.length > 0)
+	{
+		RetVal += " (chiusa "
+		GiorniChiusura.forEach(giorno => {
+			if(giorno == 1) RetVal += "lun, "
+			else if(giorno == 2) RetVal += "mar, "
+			else if(giorno == 3) RetVal += "mer, "
+			else if(giorno == 4) RetVal += "gio, "
+			else if(giorno == 5) RetVal += "ven, "
+			else if(giorno == 6) RetVal += "sab, "
+			else if(giorno == 0) RetVal += "dom, "
+		});
+		RetVal = RetVal.substr(0, RetVal.length - 2) + ")"
+	}
+
 	return RetVal
 }
 
@@ -433,11 +574,14 @@ function CaricaFrames()
 
 function SegnaProgressoCaricamento(completati)
 {
+	if(document.getElementById("loading-box").style.display == "none") return;
+
 	if(completati >= Biblioteche.length)
 	{
 		document.getElementById("loading-box").style.display = "none"
 		TimestampUltimoAggiornamento = (new Date()).getTime()
 		AggiornaPassaggioTempo()
+		document.getElementById("loading-done").innerText = 0
 	}
 	document.getElementById("loading-done").innerText = completati
 	document.querySelector("#loading-box > div > div").style.width = (completati / Biblioteche.length * 100) + "%"
@@ -482,9 +626,9 @@ function AggiornaPassaggioTempo()
 
 		var MinutiTrascorsi = Math.floor( (((new Date()).getTime()) - TimestampUltimoAggiornamento) / 60000)
 		if(MinutiTrascorsi < 1) ElemAggiornamento.style.color = "lime"
-		else if(MinutiTrascorsi < 3) ElemAggiornamento.style.color = "green"
-		else if(MinutiTrascorsi < 5) ElemAggiornamento.style.color = "unset"
-		else if(MinutiTrascorsi < 10) ElemAggiornamento.style.color = "blu"
+		else if(MinutiTrascorsi < 3) ElemAggiornamento.style.color = "limegreen"
+		else if(MinutiTrascorsi < 5) ElemAggiornamento.style.color = "dodgerblue"
+		else if(MinutiTrascorsi < 10) ElemAggiornamento.style.color = "unset"
 		else if(MinutiTrascorsi < 15) ElemAggiornamento.style.color = "orange"
 		else if(MinutiTrascorsi < 30) ElemAggiornamento.style.color = "darkorange"
 		else ElemAggiornamento.style.color = "red"
@@ -514,8 +658,18 @@ function AggiornaTuttiOrariApertura()
 
 function ControllaSeMomentoAutoRefresh()
 {
+	var Slider = document.getElementById("FrequenzaSlider")
+	var IntervalloMinuti;
+	if(Slider.value == 0) IntervalloMinuti = 1
+	else if(Slider.value == 1) IntervalloMinuti = 2
+	else if(Slider.value == 2) IntervalloMinuti = 5
+	else if(Slider.value == 3) IntervalloMinuti = 10
+	else if(Slider.value == 4) IntervalloMinuti = 15
+	else if(Slider.value == 5) IntervalloMinuti = 30
+	else if(Slider.value == 6) IntervalloMinuti = 60
+
 	if(TimestampUltimoAggiornamento == 0) CaricaFrames()
-	else if( ( ((new Date()).getTime()) - TimestampUltimoAggiornamento) >= 300000) CaricaFrames()
+	else if( ( ((new Date()).getTime()) - TimestampUltimoAggiornamento) >= (IntervalloMinuti * 60000)) CaricaFrames()
 }
 
 function TempoPassatoDaTimestamp(timestamp)
@@ -569,28 +723,36 @@ function MemorizzaPosizioneUtente(posizione)
 	{
 		PosizioneUtente = posizione;
 		document.getElementById("ordina-distanza").disabled = false;
+		document.getElementById("ordina-distanza").parentElement.style.opacity = 1;
+		document.getElementById("ordina-distanza").parentElement.style.cursor = "pointer";
+		document.getElementById("ordina-distanza").parentElement.title = "";
 		for(var i=0; i < Biblioteche.length; i++)
 		{
 			var biblioteca = Biblioteche[i]
-			var AbbiamoCoordinate = (biblioteca.latitudine != "" && biblioteca.longitudine != "")
+			var AbbiamoCoordinate = (biblioteca.latitudine != null && biblioteca.longitudine != null)
 			if(AbbiamoCoordinate)
 			{
 				DistanzaBiblioteche[i] = getDistanceFromLatLonInKm(biblioteca.latitudine, biblioteca.longitudine, PosizioneUtente.coords.latitude, PosizioneUtente.coords.longitude)
 				var distanza = DistanzaFormattata([biblioteca.latitudine, biblioteca.longitudine]);
 				var elemento = document.getElementById("Distanza" + biblioteca.sigla);
 				elemento.innerText = distanza
-				elemento.parentElement.title = 'Sei distante ' + distanza + ' dalla biblioteca ' + biblioteca.NomeBreve + '.\nClicca per vedere la mappa';
+				elemento.parentElement.title = 'Sei distante ' + distanza + ' dalla biblioteca ' + biblioteca.NomeBreve;
+				elemento.parentElement.style.display = "inline"
 			} else DistanzaBiblioteche[i] = Number.MAX_SAFE_INTEGER
 		}
 		OrdinaBoxBiblioteche();
 	} else
 	{
 		PosizioneUtente = null;
+		DistanzaBiblioteche = []
 		document.getElementById("ordina-distanza").disabled = true;
+		document.getElementById("ordina-distanza").parentElement.style.opacity = 0.5;
+		document.getElementById("ordina-distanza").parentElement.style.cursor = "not-allowed";
+		document.getElementById("ordina-distanza").parentElement.title = "Il tuo browser ha negato l'accesso alla posizione";
+
 		Biblioteche.forEach(biblioteca => {
-			var elemento = document.getElementById("Posiz" + biblioteca.sigla);
-			elemento.innerText = "posiz.";
-			elemento.parentElement.title = "Vedi la posizione della biblioteca " + biblioteca.NomeBreve + " sulla mappa";
+			var elemento = document.getElementById("Distanza" + biblioteca.sigla);
+			elemento.parentElement.style.display = "none"
 		});
 	}
 }
@@ -598,12 +760,15 @@ function MemorizzaPosizioneUtente(posizione)
 function MemorizzaRifiutoPosizioneUtente(errore)
 {
 	PosizioneUtente = null;
+	DistanzaBiblioteche = []
 	document.getElementById("ordina-distanza").disabled = true;
+	document.getElementById("ordina-distanza").parentElement.style.opacity = 0.5;
+	document.getElementById("ordina-distanza").parentElement.style.cursor = "not-allowed";
+	document.getElementById("ordina-distanza").parentElement.title = "Il tuo browser ha negato l'accesso alla posizione";
 
 	Biblioteche.forEach(biblioteca => {
-		var elemento = document.getElementById("Posiz" + biblioteca.sigla);
-		elemento.innerText = "posiz.";
-		elemento.title = "Vedi la posizione della biblioteca " + biblioteca.NomeBreve + " sulla mappa";
+		var elemento = document.getElementById("Distanza" + biblioteca.sigla);
+		elemento.parentElement.style.display = "none"
 	});
 }
 
