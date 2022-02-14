@@ -1,136 +1,56 @@
 <?php
-$BaseUrlSBA = 'http://www.sba.unipi.it/it/biblioteche/polo-'; // continua con:  "1/agraria"
-$UrlBaseGraficiPosti = 'https://qrbiblio.unipi.it/Home/Chart?IdCat=';
-
-$biblioteche = [
-    'AGR' =>
-    [   'NomeBreve' => "Agraria",
-        'NomeCompleto' => "Agraria",
-        'polo' => 1,
-        'FineUrl' => 'agraria',
-        'IDGraficoPosti' => "10a1ea41-35bc-4ec6-81af-e39cabefa260",
-    ],
-    'ECO' =>
-    [
-        'NomeBreve' => "Economia",
-        'NomeCompleto' => "Economia",
-        'polo' => 1,
-        'FineUrl' => 'economia',
-        'IDGraficoPosti' => null,
-    ],
-    'VET' =>
-    [
-        'NomeBreve' => "Veterinaria",
-        'NomeCompleto' => "Medicina veterinaria",
-        'polo' => 1,
-        'FineUrl' => 'medicina-veterinaria',
-        'IDGraficoPosti' => "8a1e70ec-7997-4097-873c-084dd8414a38",
-    ],
-    'GIU' =>
-    [
-        'NomeBreve' => "Giurisprudenza",
-        'NomeCompleto' => "Giurisprudenza e Scienze politiche",
-        'polo' => 2,
-        'FineUrl' => 'giurisprudenza',
-        'IDGraficoPosti' => "0d63f72e-4404-4f4d-bead-5bfbdee7b5b4",
-    ],
-    'CHI' =>
-    [
-        'NomeBreve' => "Chimica",
-        'NomeCompleto' => "Chimica",
-        'polo' => 3,
-        'FineUrl' => 'chimica',
-        'IDGraficoPosti' => "e4c5db0e-aec8-422d-a2d8-e2b01bfc1da7",
-    ],
-    'MIF' =>
-    [
-        'NomeBreve' => "Matematica",
-        'NomeCompleto' => "Matematica, Informatica, Fisica",
-        'polo' => 3,
-        'FineUrl' => 'matematica-informatica-fisica',
-        'IDGraficoPosti' => "c7b7fb0e-3175-4e45-a301-bcf8e2dfcc93",
-    ],
-    'SNA' =>
-    [
-        'NomeBreve' => "Biologia",
-        'NomeCompleto' => "Scienze naturali e ambientali",
-        'polo' => 3,
-        'FineUrl' => 'scienze-naturali-e-ambientali',
-        'IDGraficoPosti' => "39b31a93-86b4-4928-a94f-890b11c317a7",
-    ],
-    'MED' =>
-    [
-        'NomeBreve' => "Medicina",
-        'NomeCompleto' => "Medicina e chirurgia, Farmacia",
-        'polo' => 4,
-        'FineUrl' => 'medicina-e-chirurgia-farmacia',
-        'IDGraficoPosti' => "d334ad11-584b-4b87-be13-322463367eaa",
-    ],
-    'ING' =>
-    [
-        'NomeBreve' => "Ingegneria",
-        'NomeCompleto' => "Ingegneria",
-        'polo' => 5,
-        'FineUrl' => 'ingegneria',
-        'IDGraficoPosti' => "a96d84ba-46e8-47a1-b947-ab98a8746d6f",
-    ],
-    'ANG' =>
-    [
-        'NomeBreve' => "Anglistica",
-        'NomeCompleto' => "Anglistica",
-        'polo' => 6,
-        'FineUrl' => 'anglistica',
-        'IDGraficoPosti' => "697b9891-2510-4813-a12d-b8e0b34923d8",
-    ],
-    'ANT' =>
-    [
-        'NomeBreve' => "Antichistica",
-        'NomeCompleto' => "Antichistica, linguistica, germanistica",
-        'polo' => 6,
-        'FineUrl' => 'antichistica-linguistica-germanistica-slavistica',
-        'IDGraficoPosti' => "4c346722-ad75-4c46-a4f1-6184abfa3b44",
-    ],
-    'FIL' =>
-    [
-        'NomeBreve' => "Filosofia",
-        'NomeCompleto' => "Filosofia e storia",
-        'polo' => 6,
-        'FineUrl' => 'filosofia-e-storia',
-        'IDGraficoPosti' => "899b1b6f-80f3-4969-b0e2-aedbde979a09",
-    ],
-    'ITA' =>
-    [
-        'NomeBreve' => "Italianistica",
-        'NomeCompleto' => "Italianistica e romanistica",
-        'polo' => 6,
-        'FineUrl' => 'italianistica-romanistica',
-        'IDGraficoPosti' => "49594563-6361-4304-8992-1e75d97da7f7",
-    ],
-    'ART' =>
-    [
-        'NomeBreve' => "Arte",
-        'NomeCompleto' => "Storia delle arti",
-        'polo' => 6,
-        'FineUrl' => 'storia-delle-arti',
-        'IDGraficoPosti' => "ce5e3891-70cd-4998-add2-4441f46d83c8",
-    ],
-];
+$NomiBiblioteche = array();
+$URLHome = array();
+$URLGraficiPosti = array();
 
 Echo("  <html>
         <head></head>
         <body>
             <h1>CercaPosti biblioteche UniPi</h1>");
 
-foreach ($biblioteche as $sigla => $biblioteca)
+/********************* SCARICO LISTA BIBLIOTECHE ********************/
+$fh = fopen("http://www.sba.unipi.it/", 'r'); //or AvvisaEdEsci("Errore nel download della lista biblioteche: " . print_r(error_get_last(),true));
+if($fh === false) AvvisaEdEsci("Errore nel download della lista biblioteche: " . implode("|", $http_response_header));
+
+$sorgente = '';
+while (! feof($fh))
 {
-    Echo("<h2>" . $biblioteca['NomeCompleto'] . "</h2>");
-    ScaricaDatiSBA($biblioteca);
-    ScaricaDatiBiblioteca($biblioteca);
+    $sorgente .= fread($fh, 1);
+}
+fclose($fh);
+
+/********************* ESTRAPOLO URL BIBLIOTECHE DAL SORGENTE ********************/
+libxml_use_internal_errors(true);
+$pagina = new DOMDocument;
+$pagina->loadHTML($sorgente);
+if($pagina === false) return;
+
+$xpath = new DOMXpath($pagina);
+
+$elementi = $xpath->query('/html/body/div[4]/div/div[1]/nav/div/div/ul/li[5]/div/div/div/div/div/ul/li/div/div/div/div/div/ul/li/a');
+if (ElementoTrovato($elementi))
+{
+    foreach($elementi as $elemento)
+    {
+        $UrlCompleto = "http://www.sba.unipi.it" . $elemento->attributes->getNamedItem('href')->textContent;
+        array_push($URLHome, $UrlCompleto);
+        array_push($NomiBiblioteche, $elemento->textContent);
+    }
+}
+$NomiBiblioteche = array_reverse($NomiBiblioteche);
+
+/********************* SCARICO DATI BIBLIOTECHE ********************/
+foreach($URLHome as $URLBiblioteca)
+{
+    Echo("<h2>" . array_pop($NomiBiblioteche) . "</h2>");
+    Echo('<p><a href="' . $URLBiblioteca . '">Sito</a></p>');
+    ScaricaDatiSBA($URLBiblioteca);
     Echo('<hr>');
 }
 
 /********************* SCRIVO JSON ********************/
 /*
+                TODO           
 $posts = array();
 $posts[] = array('title'=> $title, 'url'=> $url);
 
@@ -141,26 +61,29 @@ fclose($fp);
 
 Echo("</body></html>");
 
-function ScaricaDatiSBA($biblioteca)
+function ScaricaDatiSBA($URLbiblioteca)
 {
-    if($biblioteca === null) return;
-    if($biblioteca['polo'] === null || $biblioteca['FineUrl'] === null) return;
-    
-    global $BaseUrlSBA;
-    $url = $BaseUrlSBA . $biblioteca['polo'] . '/' . $biblioteca['FineUrl'] . '/';
-    Echo('<p><a href="' . $url . '">Sito</a></p>');
+    if($URLbiblioteca === null) AvvisaEdEsci("Informazioni sulla biblioteca non disponibili: " . $URLbiblioteca);
     
     /********************* SCARICO SORGENTE PAGINA ********************/
     ini_set('display_startup_errors', 1);
     ini_set('display_errors', 1);
     error_reporting(-1);
     
-    $fh = fopen($url, 'r') or console_log("Errore nel download del codice sorgente: " . print_r(error_get_last(),true));
-    if($fh === false)
-    {
-        echo("<p>Errore nel download del codice sorgente!</p>");
-        return;
-    }
+    $OpzioniHttp = array('http' =>
+        array(
+            'method' => 'GET',
+            'max_redirects' => '5',
+            'ignore_errors' => '1'
+        )
+    );
+    $context = stream_context_create($OpzioniHttp);
+    
+    //sleep(500);
+    $fh = fopen($URLbiblioteca, 'r', false, $context); // or AvvisaEdEsci("Errore nel download delle informazioni sulla biblioteca: impossibile aprire il file descriptor! " . print_r(error_get_last(),true));
+    if($fh === false) AvvisaEdEsci("Errore nel download delle informazioni sulla biblioteca: impossibile aprire il file descriptor! " . implode("|", $http_response_header));
+
+    if(feof($fh)) AvvisaEdEsci("Errore nel download delle informazioni sulla biblioteca: il file descriptor contiene solo EOF!");
     
     $sorgente = '';
     while (! feof($fh))
@@ -168,6 +91,7 @@ function ScaricaDatiSBA($biblioteca)
         $sorgente .= fread($fh, 1);
     }
     fclose($fh);
+    if(strlen($sorgente) == 0) AvvisaEdEsci("Errore nel download delle informazioni sulla biblioteca: il codice sorgente è vuoto!");
     
     /********************* ESTRAPOLO DATI DAL SORGENTE ********************/
     libxml_use_internal_errors(true);
@@ -176,6 +100,21 @@ function ScaricaDatiSBA($biblioteca)
     if($pagina === false) return;
     
     $xpath = new DOMXpath($pagina);
+    
+    // Nome
+    //$elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/header/h1');
+    //if (ElementoTrovato($elementi)) Echo("<h2>" . $elementi[0]->textContent . "</h2>");
+    
+    // URL grafico posti disponibili
+    global $URLGraficiPosti;
+    $UrlOccupazionePosti = null;
+    $elementi = $xpath->query('//*[@id="iframe-field-room-entrance-0"]');
+    if (ElementoTrovato($elementi))
+    {
+        $UrlOccupazionePosti = $elementi[0]->attributes->getNamedItem('src')->textContent;
+        array_push($URLGraficiPosti, $UrlOccupazionePosti);
+        echo "<p>URL grafico posti: " . $UrlOccupazionePosti . "</p>";
+    } else echo '<p style="color: red">Url occupazione posti non trovato</p>';
     
     // Indirizzo testuale
     $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[2]/div/div/div/div/table/tbody/tr/td/article/div/div[1]/div/div/p');
@@ -246,11 +185,12 @@ function ScaricaDatiSBA($biblioteca)
     }
     
 
-    $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[2]/div/div/div/div/table/tbody/tr/td/article/div/section[5]/div/div/div');
+    $elementi = $xpath->query('//article/div/section[5]/div/div/div');
     if (ElementoTrovato($elementi))
     {
-        echo "<p>Node ID A: " . $elementi[0]->attributes->getNamedItem('data-nid')->textContent. "</p>";
-    }
+        echo '<p style="background-color: yellow">Trovato Node ID A! :) :)</p>';
+        echo '<p style="background-color: yellow">Node ID A: ' . $elementi[0]->attributes->getNamedItem('data-nid')->textContent. "</p>";
+    } else echo '<p style="color: red">Impossibile trovare elemento Node ID A!</p>';
     
       
     $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[2]/div/div/div/div/table/tbody/tr/td/article');
@@ -285,49 +225,35 @@ function ScaricaDatiSBA($biblioteca)
         }
         echo("</ul>");
     }
-}
-
-function ElementoTrovato($ArrayRisultati)
-{
-    if($ArrayRisultati === null || $ArrayRisultati === false ||
-        count($ArrayRisultati) <= 0 || $ArrayRisultati[0] === null) return false;
-    else return true;
-}
-
-function getRedirectUrl($url)
-{
-    stream_context_set_default(array(
-        'http' => array(
-            'method' => 'HEAD'
-        )
-    ));
-    $headers = get_headers($url, 1);
-    if ($headers !== false && isset($headers['Location'])) {
-        return is_array($headers['Location']) ? array_pop($headers['Location']) : $headers['Location'];
-    }
-    return false;
-}
-
-function ScaricaDatiBiblioteca($biblioteca)
-{
-    if($biblioteca === null) return;
     
-    if($biblioteca['IDGraficoPosti'] === null)
+    if($UrlOccupazionePosti !== null) ScaricaDatiOccupazionePosti($UrlOccupazionePosti);
+    else Echo("Dati di occupazione dei posti non disponibili");
+}
+
+function ScaricaDatiOccupazionePosti($URLgrafico)
+{
+    if($URLgrafico === null)
     {
         Echo("Dati di occupazione dei posti non disponibili");
         return;
     }
     
-    global $UrlBaseGraficiPosti;
-    Echo('<p><a href="' . $UrlBaseGraficiPosti . $biblioteca['IDGraficoPosti'] . '">Occupazione posti</a></p>');
+    
+    Echo('<p><a href="' . $URLgrafico . '">Occupazione posti</a></p>');
 
     /********************* SCARICO SORGENTE PAGINA ********************/
-    $fh = fopen($UrlBaseGraficiPosti . $biblioteca['IDGraficoPosti'], 'r') or console_log("Errore nel download del codice sorgente");
-    if($fh === false)
-    {
-        echo("Errore nel download del codice sorgente!");
-        return;
-    }
+    $OpzioniHttp = array('http' =>
+        array(
+            'method' => 'GET',
+            'max_redirects' => '5',
+            'ignore_errors' => '1'
+        )
+    );
+    $context = stream_context_create($OpzioniHttp);
+    
+    //sleep(500);
+    $fh = fopen($URLgrafico, 'r', false, $context);
+    if($fh === false) AvvisaEdEsci("Errore nel download dei dati di occupazione dei posti! " . implode("|", $http_response_header));
     
     $sorgente = '';
     while (! feof($fh))
@@ -344,7 +270,7 @@ function ScaricaDatiBiblioteca($biblioteca)
     $PosInizioDati = strpos($sorgente, "var yValues");
     if($PosInizioDati === false)
     {
-        console_log("Errore nel parsing del codice sorgente: dati sull'occupazione dei posti non trovati!");
+        AvvisaEdEsci("Errore nel parsing dei dati di occupazione dei posti: numeri dei posti non trovati!");
     } else
     {
         $PosInizioLiberi = strpos($sorgente, '"', $PosInizioDati) + 1;
@@ -367,10 +293,30 @@ function ScaricaDatiBiblioteca($biblioteca)
     }
 }
 
-function console_log( $data )
+function AvvisaEdEsci($testo)
 {
-    echo '<script>';
-    echo 'console.log('. json_encode( $data ) .')';
-    echo '</script>';
+    echo '<p style="font-weight: bold; color: red">' . $testo . '</p>';
+    exit();
+}
+
+function ElementoTrovato($ArrayRisultati)
+{
+    if($ArrayRisultati === null || $ArrayRisultati === false ||
+        count($ArrayRisultati) <= 0 || $ArrayRisultati[0] === null) return false;
+        else return true;
+}
+
+function getRedirectUrl($url)
+{
+    stream_context_set_default(array(
+        'http' => array(
+            'method' => 'HEAD'
+        )
+    ));
+    $headers = get_headers($url, 1);
+    if ($headers !== false && isset($headers['Location'])) {
+        return is_array($headers['Location']) ? array_pop($headers['Location']) : $headers['Location'];
+    }
+    return false;
 }
 ?>
