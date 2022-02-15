@@ -91,7 +91,7 @@ function ScaricaDatiSBA($URLbiblioteca)
         $sorgente .= fread($fh, 1);
     }
     fclose($fh);
-    if(strlen($sorgente) == 0) AvvisaEdEsci("Errore nel download delle informazioni sulla biblioteca: il codice sorgente è vuoto!");
+    if(strlen($sorgente) == 0) AvvisaEdEsci("Errore nel download delle informazioni sulla biblioteca: il codice sorgente Ã¨ vuoto!");
     
     /********************* ESTRAPOLO DATI DAL SORGENTE ********************/
     libxml_use_internal_errors(true);
@@ -121,16 +121,21 @@ function ScaricaDatiSBA($URLbiblioteca)
     if (ElementoTrovato($elementi)) echo "<p>Indirizzo: " . $elementi[0]->textContent . "</p>";
     
     // Telefono
-    $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[2]/div/div/div/div/table/tbody/tr/td/article/div/section[1]/div/div');
+    $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[2]/div/div/div/div/table/tbody/tr[1]/td/article/div/section[1]/div');
     if (ElementoTrovato($elementi)) echo "<p>Telefono: " . $elementi[0]->textContent . "</p>";
     
+    // Link Google Maps e coordinate
     $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[2]/div/div/div/div/table/tbody/tr/td/article/div/div[2]/div/div/a');
     if (ElementoTrovato($elementi))
     {
         $UrlMappa = $elementi[0]->attributes->getNamedItem('href')->textContent;
         echo "<p>URL mappa: " . $UrlMappa . "</p>";
         
-        if(strpos($UrlMappa, '@') === false) $UrlMappa = getRedirectUrl($UrlMappa);
+        if(strpos($UrlMappa, '@') === false)
+        {
+            if(strpos($UrlMappa, '/?q=') !== false) { echo "<p>Contiene /?q=</p>"; $UrlMappa = str_replace('/?q=', '/maps/place/', $UrlMappa); }
+            while(SeguiRedirectHTTP($UrlMappa) !== false) $UrlMappa = SeguiRedirectHTTP($UrlMappa);
+        }
         
         if(($InizioCoord = strpos($UrlMappa, '@')) !== false)
         {
@@ -143,21 +148,49 @@ function ScaricaDatiSBA($URLbiblioteca)
         }
     }
     
+    // Fax
     $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[2]/div/div/div/div/table/tbody/tr/td/article/div/section[2]/div/div');
     if (ElementoTrovato($elementi)) echo "<p>Fax: " . $elementi[0]->textContent. "</p>";
     
+    // Email
     $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[2]/div/div/div/div/table/tbody/tr/td/article/div/section[3]/div/div/a');
     if (ElementoTrovato($elementi)) echo "<p>Email: " . $elementi[0]->textContent. "</p>";
     
-    $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/section[1]/div/div');
-    if (ElementoTrovato($elementi)) echo "<p>Posti pre-covid: " . $elementi[0]->textContent. "</p>";
+    // Capienza e aria condizionata
+    $sezioni = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/section');
+    if (ElementoTrovato($sezioni))
+    {
+        foreach($sezioni as $sezione)
+        {
+            $titolo = $xpath->query('h2', $sezione);
+            
+            if(ElementoTrovato($titolo))
+            {
+                $TestoTitolo = $titolo[0]->textContent;
+                $TestoTitolo = substr($TestoTitolo, 0, strlen($TestoTitolo) - 2);
+                $contenuto = $xpath->query('div', $sezione);
+                
+                if(strcmp($TestoTitolo,'Posti di lettura:') == 0 && ElementoTrovato($contenuto))
+                {
+                    echo "<p>Posti pre-covid: " . $contenuto[0]->textContent. "</p>";
+                }
+                else if(strcmp($TestoTitolo,'Posti di lettura durante il Covid:') == 0 && ElementoTrovato($contenuto))
+                {
+                    echo "<p>Posti post-covid: " . $contenuto[0]->textContent. "</p>";
+                }
+                else if(strcmp($TestoTitolo,'Aria condizionata:') == 0 && ElementoTrovato($contenuto))
+                {
+                    echo "<p>Aria condizionata: " . $contenuto[0]->textContent. "</p>";
+                }
+                else if(strcmp($TestoTitolo,'Dipartimenti afferenti:') == 0 && ElementoTrovato($contenuto))
+                {
+                    echo "<p>Dipartimenti afferenti: " . $contenuto[0]->textContent. "</p>";
+                }
+            }
+        }
+    }
     
-    $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/section[2]/div/div');
-    if (ElementoTrovato($elementi)) echo "<p>Posti post-covid: " . $elementi[0]->textContent. "</p>";
-    
-    $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/section[3]/div/div');
-    if (ElementoTrovato($elementi)) echo "<p>Aria condizionata: " . $elementi[0]->textContent. "</p>";
-    
+    // Pagina Facebook
     $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[2]/div/section/div/div/iframe');
     if (ElementoTrovato($elementi))
     {
@@ -168,6 +201,7 @@ function ScaricaDatiSBA($URLbiblioteca)
         echo '<p>Pagina Facebook: <a href="' . urldecode($UrlPagina) . '">' . urldecode($UrlPagina) . '</a></p>';
     }
 
+    // Avvisi
     $elementiAvvisiUrgenti = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/section/div/div/div/span/a');
     $elementiAvvisiNormali = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/section/div/div/div/a');
     if (ElementoTrovato($elementiAvvisiUrgenti) || ElementoTrovato($elementiAvvisiNormali))
@@ -184,22 +218,27 @@ function ScaricaDatiSBA($URLbiblioteca)
         echo("</ul></p>");
     }
     
-
-    $elementi = $xpath->query('//article/div/section[5]/div/div/div');
-    if (ElementoTrovato($elementi))
-    {
-        echo '<p style="background-color: yellow">Trovato Node ID A! :) :)</p>';
-        echo '<p style="background-color: yellow">Node ID A: ' . $elementi[0]->attributes->getNamedItem('data-nid')->textContent. "</p>";
-    } else echo '<p style="color: red">Impossibile trovare elemento Node ID A!</p>';
-    
-      
+    // ID webapp orario di apertura
+    $NID = null;
     $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[2]/div/div/div/div/table/tbody/tr/td/article');
     if (ElementoTrovato($elementi))
     {
         $IdElemento = $elementi[0]->attributes->getNamedItem('id')->textContent;
         $NID = substr($IdElemento, 5, strlen($IdElemento) - 5);
-        echo "<p>Node ID B: " . $NID;
-        echo ' <a href="https://www.sba.unipi.it/it/opening_hours/instances?nid=' . $NID . '&from_date=2022-02-10&to_date=2022-02-15">URL</a></p>';
+    } else
+    {
+        $inizioNID = strpos($sorgente, 'data-nid="');
+        if($inizioNID !== false)
+        {
+            $inizioNID = $inizioNID + 10;
+            $fineNID = strpos($sorgente, '"', $inizioNID);
+            $NID = substr($sorgente, $inizioNID, $fineNID - $inizioNID);
+        }
+    }
+    if($NID !== null)
+    {
+        echo "<p>Node ID: " . $NID;
+        echo ' <a href="https://www.sba.unipi.it/it/opening_hours/instances?nid=' . $NID . '&from_date=2022-02-10&to_date=2022-02-18">URL</a></p>';
     }
     
     $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/section[4]/div/div/span/a');
@@ -213,6 +252,7 @@ function ScaricaDatiSBA($URLbiblioteca)
         echo("</ul>");
     }
     
+    // Piantina
     $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[4]/div/figure/a');
     if (ElementoTrovato($elementi))
     {
@@ -265,7 +305,7 @@ function ScaricaDatiOccupazionePosti($URLgrafico)
     
     /********************* ESTRAPOLO DATI DAL SORGENTE ********************/
     
-    // devo trovare nel sorgente la riga: «var yValues = ["11","0"];»
+    // devo trovare nel sorgente la riga: Â«var yValues = ["11","0"];Â»
     // dove 11 sono i posti liberi, e 0 sono i posti occupati
     $PosInizioDati = strpos($sorgente, "var yValues");
     if($PosInizioDati === false)
@@ -306,7 +346,7 @@ function ElementoTrovato($ArrayRisultati)
         else return true;
 }
 
-function getRedirectUrl($url)
+function SeguiRedirectHTTP($url)
 {
     stream_context_set_default(array(
         'http' => array(
