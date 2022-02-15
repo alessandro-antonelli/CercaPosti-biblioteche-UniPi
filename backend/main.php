@@ -1,75 +1,64 @@
 <?php
-$NomiBiblioteche = array();
-$URLHome = array();
-$URLGraficiPosti = array();
+$biblioteche = array();
+$risposta = array();
 
-Echo("  <html>
-        <head></head>
-        <body>
-            <h1>CercaPosti biblioteche UniPi</h1>");
+$risposta["timestamp"] = time();
 
 /********************* SCARICO LISTA BIBLIOTECHE ********************/
-$fh = fopen("http://www.sba.unipi.it/", 'r'); //or AvvisaEdEsci("Errore nel download della lista biblioteche: " . print_r(error_get_last(),true));
-if($fh === false) AvvisaEdEsci("Errore nel download della lista biblioteche: " . implode("|", $http_response_header));
-
-$sorgente = '';
-while (! feof($fh))
+$fh = fopen("http://www.sba.unipi.it/", 'r');
+if($fh === false) $risposta["esito"] = implode("; ", $http_response_header); //Errore nel download della lista biblioteche
+else
 {
-    $sorgente .= fread($fh, 1);
-}
-fclose($fh);
+    $risposta["esito"] = "ok";
+    $sorgente = '';
+    while (! feof($fh)) $sorgente .= fread($fh, 1);
+    fclose($fh);
 
-/********************* ESTRAPOLO URL BIBLIOTECHE DAL SORGENTE ********************/
-libxml_use_internal_errors(true);
-$pagina = new DOMDocument;
-$pagina->loadHTML($sorgente);
-if($pagina === false) return;
+    /********************* ESTRAPOLO URL BIBLIOTECHE DAL SORGENTE e POPOLO l'array biblioteche ********************/
+    $pagina = new DOMDocument;
+    $pagina->loadHTML($sorgente);
+    if($pagina === false) return;
 
-$xpath = new DOMXpath($pagina);
+    $xpath = new DOMXpath($pagina);
 
-$elementi = $xpath->query('/html/body/div[4]/div/div[1]/nav/div/div/ul/li[5]/div/div/div/div/div/ul/li/div/div/div/div/div/ul/li/a');
-if (ElementoTrovato($elementi))
-{
-    foreach($elementi as $elemento)
+    $elementi = $xpath->query('/html/body/div[4]/div/div[1]/nav/div/div/ul/li[5]/div/div/div/div/div/ul/li/div/div/div/div/div/ul/li/a');
+    if (ElementoTrovato($elementi))
     {
-        $UrlCompleto = "http://www.sba.unipi.it" . $elemento->attributes->getNamedItem('href')->textContent;
-        array_push($URLHome, $UrlCompleto);
-        array_push($NomiBiblioteche, $elemento->textContent);
-    }
-}
-$NomiBiblioteche = array_reverse($NomiBiblioteche);
+        foreach($elementi as $elemento)
+        {
+            $biblioteca = array();
 
-/********************* SCARICO DATI BIBLIOTECHE ********************/
-foreach($URLHome as $URLBiblioteca)
-{
-    Echo("<h2>" . array_pop($NomiBiblioteche) . "</h2>");
-    Echo('<p><a href="' . $URLBiblioteca . '">Sito</a></p>');
-    ScaricaDatiSBA($URLBiblioteca);
-    Echo('<hr>');
+            $NomeCompleto = $elemento->textContent;
+            $biblioteca["NomeCompleto"] = trim($NomeCompleto);
+
+            $UrlCompleto = "http://www.sba.unipi.it" . $elemento->attributes->getNamedItem('href')->textContent;
+            $biblioteca["UrlSito"] = $UrlCompleto;
+
+            /********************* SCARICO DATI BIBLIOTECHE ********************/
+            ScaricaDatiBiblioteca($biblioteca, $UrlCompleto);
+
+            $biblioteche[] = $biblioteca;
+        }
+    }
 }
 
 /********************* SCRIVO JSON ********************/
-/*
-                TODO           
-$posts = array();
-$posts[] = array('title'=> $title, 'url'=> $url);
+$risposta["biblioteche"] = $biblioteche;
+echo(json_encode($risposta));
 
-$fp = fopen('dati.json', 'w');
-fwrite($fp, json_encode($posts));
-fclose($fp);
-*/
 
-Echo("</body></html>");
 
-function ScaricaDatiSBA($URLbiblioteca)
+/****************************************************************************
+ ****************************************************************************
+ **************************************************************************** */
+
+
+
+function ScaricaDatiBiblioteca(&$biblioteca, $URLbiblioteca)
 {
-    if($URLbiblioteca === null) AvvisaEdEsci("Informazioni sulla biblioteca non disponibili: " . $URLbiblioteca);
+    if($URLbiblioteca === null) { $biblioteca["esito"] = "l'URL del sito è vuoto"; return; } //Informazioni sulla biblioteca non disponibili
     
     /********************* SCARICO SORGENTE PAGINA ********************/
-    ini_set('display_startup_errors', 1);
-    ini_set('display_errors', 1);
-    error_reporting(-1);
-    
     $OpzioniHttp = array('http' =>
         array(
             'method' => 'GET',
@@ -79,61 +68,57 @@ function ScaricaDatiSBA($URLbiblioteca)
     );
     $context = stream_context_create($OpzioniHttp);
     
-    //sleep(500);
-    $fh = fopen($URLbiblioteca, 'r', false, $context); // or AvvisaEdEsci("Errore nel download delle informazioni sulla biblioteca: impossibile aprire il file descriptor! " . print_r(error_get_last(),true));
-    if($fh === false) AvvisaEdEsci("Errore nel download delle informazioni sulla biblioteca: impossibile aprire il file descriptor! " . implode("|", $http_response_header));
-
-    if(feof($fh)) AvvisaEdEsci("Errore nel download delle informazioni sulla biblioteca: il file descriptor contiene solo EOF!");
+    $fh = fopen($URLbiblioteca, 'r', false, $context);
+    if($fh === false)
+    {
+        //Errore nel download delle informazioni sulla biblioteca: impossibile aprire il file descriptor!
+        $biblioteca["esito"] = implode("|", $http_response_header);
+        return;
+    } else if(feof($fh))
+    {
+        $biblioteca["esito"] = "il file descriptor contiene solo EOF!";
+        return;
+    }
     
     $sorgente = '';
-    while (! feof($fh))
-    {
-        $sorgente .= fread($fh, 1);
-    }
+    while (! feof($fh)) $sorgente .= fread($fh, 1);
     fclose($fh);
-    if(strlen($sorgente) == 0) AvvisaEdEsci("Errore nel download delle informazioni sulla biblioteca: il codice sorgente è vuoto!");
+    if(strlen($sorgente) == 0)
+    {
+        $biblioteca["esito"] = "il codice sorgente è vuoto!";
+        return;
+    }
+    $biblioteca["esito"] = "ok";
     
     /********************* ESTRAPOLO DATI DAL SORGENTE ********************/
-    libxml_use_internal_errors(true);
     $pagina = new DOMDocument;
     $pagina->loadHTML($sorgente);
-    if($pagina === false) return;
+    if($pagina === false) { $biblioteca["esito"] = "il codice sorgente non è un HTML valido!"; return; }
     
     $xpath = new DOMXpath($pagina);
     
     // Nome
-    //$elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/header/h1');
-    //if (ElementoTrovato($elementi)) Echo("<h2>" . $elementi[0]->textContent . "</h2>");
-    
-    // URL grafico posti disponibili
-    global $URLGraficiPosti;
-    $UrlOccupazionePosti = null;
-    $elementi = $xpath->query('//*[@id="iframe-field-room-entrance-0"]');
-    if (ElementoTrovato($elementi))
-    {
-        $UrlOccupazionePosti = $elementi[0]->attributes->getNamedItem('src')->textContent;
-        array_push($URLGraficiPosti, $UrlOccupazionePosti);
-        echo "<p>URL grafico posti: " . $UrlOccupazionePosti . "</p>";
-    } else echo '<p style="color: red">Url occupazione posti non trovato</p>';
+    $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/header/h1');
+    if (ElementoTrovato($elementi)) $biblioteca["NomeCompleto"] = trim($elementi[0]->textContent);
     
     // Indirizzo testuale
     $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[2]/div/div/div/div/table/tbody/tr/td/article/div/div[1]/div/div/p');
-    if (ElementoTrovato($elementi)) echo "<p>Indirizzo: " . $elementi[0]->textContent . "</p>";
+    if (ElementoTrovato($elementi)) $biblioteca["indirizzo"] = $elementi[0]->textContent;
     
     // Telefono
     $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[2]/div/div/div/div/table/tbody/tr[1]/td/article/div/section[1]/div');
-    if (ElementoTrovato($elementi)) echo "<p>Telefono: " . $elementi[0]->textContent . "</p>";
+    if (ElementoTrovato($elementi)) $biblioteca["telefono"] = $elementi[0]->textContent;
     
     // Link Google Maps e coordinate
     $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[2]/div/div/div/div/table/tbody/tr/td/article/div/div[2]/div/div/a');
     if (ElementoTrovato($elementi))
     {
         $UrlMappa = $elementi[0]->attributes->getNamedItem('href')->textContent;
-        echo "<p>URL mappa: " . $UrlMappa . "</p>";
+        $biblioteca["UrlMappa"] = $UrlMappa;
         
         if(strpos($UrlMappa, '@') === false)
         {
-            if(strpos($UrlMappa, '/?q=') !== false) { echo "<p>Contiene /?q=</p>"; $UrlMappa = str_replace('/?q=', '/maps/place/', $UrlMappa); }
+            if(strpos($UrlMappa, '/?q=') !== false) $UrlMappa = str_replace('/?q=', '/maps/place/', $UrlMappa);
             while(SeguiRedirectHTTP($UrlMappa) !== false) $UrlMappa = SeguiRedirectHTTP($UrlMappa);
         }
         
@@ -143,18 +128,18 @@ function ScaricaDatiSBA($URLbiblioteca)
             $FineCoord = strpos($UrlMappa, ',', $DivisoreLatLong + 1);
             $lat = substr($UrlMappa, $InizioCoord + 1, $DivisoreLatLong - $InizioCoord - 1);
             $long = substr($UrlMappa, $DivisoreLatLong + 1, $FineCoord - $DivisoreLatLong - 1);
-            echo('<p>Latitudine: ' . $lat . '</p>');
-            echo('<p>Longitudine: ' . $long . '</p>');
+            $biblioteca["latitudine"] = $lat;
+            $biblioteca["longitudine"] = $long;
         }
     }
     
     // Fax
     $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[2]/div/div/div/div/table/tbody/tr/td/article/div/section[2]/div/div');
-    if (ElementoTrovato($elementi)) echo "<p>Fax: " . $elementi[0]->textContent. "</p>";
+    if (ElementoTrovato($elementi)) $biblioteca["fax"] = $elementi[0]->textContent;
     
     // Email
     $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[2]/div/div/div/div/table/tbody/tr/td/article/div/section[3]/div/div/a');
-    if (ElementoTrovato($elementi)) echo "<p>Email: " . $elementi[0]->textContent. "</p>";
+    if (ElementoTrovato($elementi)) $biblioteca["email"] = $elementi[0]->textContent;
     
     // Capienza e aria condizionata
     $sezioni = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/section');
@@ -172,19 +157,19 @@ function ScaricaDatiSBA($URLbiblioteca)
                 
                 if(strcmp($TestoTitolo,'Posti di lettura:') == 0 && ElementoTrovato($contenuto))
                 {
-                    echo "<p>Posti pre-covid: " . $contenuto[0]->textContent. "</p>";
+                    $biblioteca["CapienzaPreCovid"] = intval($contenuto[0]->textContent);
                 }
                 else if(strcmp($TestoTitolo,'Posti di lettura durante il Covid:') == 0 && ElementoTrovato($contenuto))
                 {
-                    echo "<p>Posti post-covid: " . $contenuto[0]->textContent. "</p>";
+                    $biblioteca["CapienzaPostCovid"] = intval($contenuto[0]->textContent);
                 }
                 else if(strcmp($TestoTitolo,'Aria condizionata:') == 0 && ElementoTrovato($contenuto))
                 {
-                    echo "<p>Aria condizionata: " . $contenuto[0]->textContent. "</p>";
+                    $biblioteca["AriaCondizionata"] = $contenuto[0]->textContent;
                 }
                 else if(strcmp($TestoTitolo,'Dipartimenti afferenti:') == 0 && ElementoTrovato($contenuto))
                 {
-                    echo "<p>Dipartimenti afferenti: " . $contenuto[0]->textContent. "</p>";
+                    $biblioteca["DipartimentiAfferenti"] = $contenuto[0]->textContent;
                 }
             }
         }
@@ -198,7 +183,7 @@ function ScaricaDatiSBA($URLbiblioteca)
         $PosInizioUrlPagina = strpos($UrlIncorporazione, 'href=') + 5;
         $PosFineUrlPagina = strpos($UrlIncorporazione, '&', $PosInizioUrlPagina);
         $UrlPagina = substr($UrlIncorporazione, $PosInizioUrlPagina, $PosFineUrlPagina - $PosInizioUrlPagina);
-        echo '<p>Pagina Facebook: <a href="' . urldecode($UrlPagina) . '">' . urldecode($UrlPagina) . '</a></p>';
+        $biblioteca["UrlFacebook"] = urldecode($UrlPagina);
     }
 
     // Avvisi
@@ -206,18 +191,49 @@ function ScaricaDatiSBA($URLbiblioteca)
     $elementiAvvisiNormali = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/section/div/div/div/a');
     if (ElementoTrovato($elementiAvvisiUrgenti) || ElementoTrovato($elementiAvvisiNormali))
     {
-        echo "<p>Avvisi:</p>" . "</p><ul>";
+        $avvisi = array();
         foreach($elementiAvvisiUrgenti as $elemento)
         {
-            echo '<li style="font-weight: bold"><a href="https://www.sba.unipi.it' . $elemento->attributes->getNamedItem("href")->textContent . '">' . $elemento->textContent . "</a></li>";
+            $avvisi[] = array('url' => "https://www.sba.unipi.it" . $elemento->attributes->getNamedItem("href")->textContent,
+                                    'titolo' => $elemento->textContent,
+                                    'urgente' => true);
         }
         foreach($elementiAvvisiNormali as $elemento)
         {
-            echo '<li><a href="https://www.sba.unipi.it' . $elemento->attributes->getNamedItem("href")->textContent . '">' . $elemento->textContent . "</a></li>";
+            $avvisi[] = array('url' => "https://www.sba.unipi.it" . $elemento->attributes->getNamedItem("href")->textContent,
+                                    'titolo' => $elemento->textContent,
+                                    'urgente' => false);
         }
-        echo("</ul></p>");
+        $biblioteca["avvisi"] = $avvisi;
     }
     
+    // Piantina PDF
+    $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/section[4]/div/div/span/a');
+    if (ElementoTrovato($elementi))
+    {
+        $MappePDF = array(); //Piantina con collocazioni e servizi
+        foreach($elementi as $elemento)
+        {
+            $MappePDF[] = array('url' => $elemento->attributes->getNamedItem('href')->textContent,
+                                'nome' => $elemento->textContent);
+        }
+        $biblioteca["MappePDF"] = $MappePDF;
+    }
+    
+    // Piantina PNG
+    $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[4]/div/figure/a');
+    if (ElementoTrovato($elementi))
+    {
+        $MappePNG = array();
+        foreach($elementi as $elemento)
+        {
+            $UrlIMG = $elemento->attributes->getNamedItem('href')->textContent;
+            $NomeFileIMG = basename($UrlIMG);
+            $MappePNG[] = array('url' => $UrlIMG, 'nome' => $NomeFileIMG);
+        }
+        $biblioteca["MappePNG"] = $MappePNG;
+    }
+
     // ID webapp orario di apertura
     $NID = null;
     $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[2]/div/div/div/div/table/tbody/tr/td/article');
@@ -237,49 +253,79 @@ function ScaricaDatiSBA($URLbiblioteca)
     }
     if($NID !== null)
     {
-        echo "<p>Node ID: " . $NID;
-        echo ' <a href="https://www.sba.unipi.it/it/opening_hours/instances?nid=' . $NID . '&from_date=2022-02-10&to_date=2022-02-18">URL</a></p>';
+        $biblioteca["IDorario"] = $NID; //Node ID
+
+        //le date devono essere in formato ISO: esempio 2022-01-31
+        $DataOggi = date("Y-m-d");
+        $DataDopoDomani = date("Y-m-d", strtotime($DataOggi . ' + 2 days'));
+        $UrlOrario = 'http://www.sba.unipi.it/it/opening_hours/instances?nid=' . $NID . '&from_date=' . $DataOggi . '&to_date=' . $DataDopoDomani;
+
+        $ArrayAperture = ScaricaDatiOrario($UrlOrario);
+        if($ArrayAperture !== null) $biblioteca["OrarioApertura"] = $ArrayAperture;
     }
-    
-    $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/section[4]/div/div/span/a');
+
+    // URL grafico posti disponibili
+    $elementi = $xpath->query('//*[@id="iframe-field-room-entrance-0"]');
     if (ElementoTrovato($elementi))
     {
-        echo("<p>Piantina con collocazioni e servizi (PDF):</p><ul>");
-        foreach($elementi as $elemento)
-        {
-            echo('<li><a href="' . $elemento->attributes->getNamedItem('href')->textContent . '">' . $elemento->textContent . '</a></li>');
-        }
-        echo("</ul>");
+        $UrlOccupazionePosti = $elementi[0]->attributes->getNamedItem('src')->textContent;
+        $biblioteca["UrlOccupazionePosti"] = $UrlOccupazionePosti;
+        
+        $ArrayPosti = ScaricaDatiOccupazionePosti($UrlOccupazionePosti);
+        $biblioteca["StatoOccupazionePosti"] = $ArrayPosti;
     }
-    
-    // Piantina
-    $elementi = $xpath->query('/html/body/div[4]/div/div[3]/div[1]/div/section/div/div/article/div/div[4]/div/figure/a');
-    if (ElementoTrovato($elementi))
+}
+
+function ScaricaDatiOrario($UrlOrario)
+{
+    $risultato = array();
+    $risultato["timestamp"] = time();
+    $risultato["url"] = $UrlOrario;
+    if($UrlOrario === null)
     {
-        echo("<p>Piantina con collocazioni e servizi (PNG):</p><ul>");
-        foreach($elementi as $elemento)
-        {
-            $UrlIMG = $elemento->attributes->getNamedItem('href')->textContent;
-            $NomeFileIMG = basename($UrlIMG);
-            echo('<li><a href="' . $UrlIMG . '">' . $NomeFileIMG . '</a></li>');
-        }
-        echo("</ul>");
+        $risultato["esito"] = "URL vuoto";
+        return $risultato;
     }
+
+    /********************* SCARICO SORGENTE PAGINA ********************/
+    $OpzioniHttp = array('http' =>
+        array(
+            'method' => 'GET',
+            'max_redirects' => '5',
+            'ignore_errors' => '1'
+        )
+    );
+    $context = stream_context_create($OpzioniHttp);
+
+    $fh = fopen($UrlOrario, 'r', false, $context);
+    if($fh === false) { $risultato["esito"] = implode("; ", $http_response_header); return $risultato; }
     
-    if($UrlOccupazionePosti !== null) ScaricaDatiOccupazionePosti($UrlOccupazionePosti);
-    else Echo("Dati di occupazione dei posti non disponibili");
+    $sorgente = '';
+    while (! feof($fh)) $sorgente .= fread($fh, 1);
+    fclose($fh);
+    if($sorgente === null || strlen($sorgente) == 0) $risultato["esito"] = "ricevuta risposta vuota!";
+    else
+    {   
+        $array = json_decode($sorgente);
+        if($array === null) $risultato["esito"] = "Ricevuta risposta non JSON: " . $sorgente;
+        else
+        {
+            $risultato["esito"] = "ok";
+            $risultato["aperture"] = $array;
+        }
+    }
+    return $risultato;
 }
 
 function ScaricaDatiOccupazionePosti($URLgrafico)
 {
+    $risultato = array();
+    $risultato["timestamp"] = time();
     if($URLgrafico === null)
     {
-        Echo("Dati di occupazione dei posti non disponibili");
-        return;
+        $risultato["esito"] = "URL vuoto"; //"Dati di occupazione dei posti non disponibili"
+        return risultato;
     }
-    
-    
-    Echo('<p><a href="' . $URLgrafico . '">Occupazione posti</a></p>');
 
     /********************* SCARICO SORGENTE PAGINA ********************/
     $OpzioniHttp = array('http' =>
@@ -291,52 +337,47 @@ function ScaricaDatiOccupazionePosti($URLgrafico)
     );
     $context = stream_context_create($OpzioniHttp);
     
-    //sleep(500);
     $fh = fopen($URLgrafico, 'r', false, $context);
-    if($fh === false) AvvisaEdEsci("Errore nel download dei dati di occupazione dei posti! " . implode("|", $http_response_header));
+    if($fh === false) { $risultato["esito"] = implode("; ", $http_response_header); return risultato; }
     
     $sorgente = '';
-    while (! feof($fh))
-    {
-        //$LunghDaLeggere = min([0 => 1048576, 1 => strlen($sorgente)]);
-        $sorgente .= fread($fh, 1);
-    }
+    while (! feof($fh)) $sorgente .= fread($fh, 1);
     fclose($fh);
     
     /********************* ESTRAPOLO DATI DAL SORGENTE ********************/
     
-    // devo trovare nel sorgente la riga: «var yValues = ["11","0"];»
+    // Devo trovare nel sorgente la riga: «var yValues = ["11","0"];»
     // dove 11 sono i posti liberi, e 0 sono i posti occupati
     $PosInizioDati = strpos($sorgente, "var yValues");
     if($PosInizioDati === false)
     {
-        AvvisaEdEsci("Errore nel parsing dei dati di occupazione dei posti: numeri dei posti non trovati!");
+        //Errore nel parsing dei dati di occupazione dei posti
+        $risultato["esito"] = implode("; ", "numeri dei posti non trovati nel sorgente!");
+        return risultato;
     } else
     {
+        $risultato["esito"] = "ok";
+
         $PosInizioLiberi = strpos($sorgente, '"', $PosInizioDati) + 1;
         $PosFineLiberi = strpos($sorgente, '"', $PosInizioLiberi);
-        $PostiLiberi = substr($sorgente, $PosInizioLiberi, $PosFineLiberi - $PosInizioLiberi);
-        Echo("<p>Liberi = " . $PostiLiberi . "</p>");
+        $PostiLiberi = intval(substr($sorgente, $PosInizioLiberi, $PosFineLiberi - $PosInizioLiberi));
+        $risultato["liberi"] = $PostiLiberi;
         
         $PosInizioOccupati = strpos($sorgente, '"', $PosFineLiberi + 1) + 1;
         $PosFineOccupati = strpos($sorgente, '"', $PosInizioOccupati);
-        $PostiOccupati = substr($sorgente, $PosInizioOccupati, $PosFineOccupati - $PosInizioOccupati);
-        Echo("<p>Occupati = " . $PostiOccupati . "</p>");
+        $PostiOccupati = intval(substr($sorgente, $PosInizioOccupati, $PosFineOccupati - $PosInizioOccupati));
+        $risultato["occupati"] = $PostiOccupati;
         
         $PostiTotali = $PostiOccupati + $PostiLiberi;
-        Echo("<p>Saldo = " . $PostiTotali . "</p>");
+        $risultato["saldo"] = $PostiTotali;
         
         $PosInizioCapienzaDichiarata = strpos($sorgente, 'var sottoTitolo = "Posti Totali: ') + 33;
         $PosFineCapienzaDichiarata = strpos($sorgente, '"', $PosInizioCapienzaDichiarata);
-        $CapienzaDichiarata = substr($sorgente, $PosInizioCapienzaDichiarata, $PosFineCapienzaDichiarata - $PosInizioCapienzaDichiarata);
-        Echo("<p>Capienza dichiarata = " . $CapienzaDichiarata . "</p>");
-    }
-}
+        $CapienzaDichiarata = intval(substr($sorgente, $PosInizioCapienzaDichiarata, $PosFineCapienzaDichiarata - $PosInizioCapienzaDichiarata));
+        $risultato["capienza"] = $CapienzaDichiarata;
 
-function AvvisaEdEsci($testo)
-{
-    echo '<p style="font-weight: bold; color: red">' . $testo . '</p>';
-    exit();
+        return $risultato;
+    }
 }
 
 function ElementoTrovato($ArrayRisultati)
